@@ -15,6 +15,11 @@ namespace MusicAPI
 
             app.MapGet("/", () => "Hello World!");
 
+            app.MapGet("/Users", () =>
+            {
+                
+            });
+
             app.Run();
         }
     }
