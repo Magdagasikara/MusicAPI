@@ -27,7 +27,7 @@ namespace MusicAPI.Handlers
             }
 
             userHelper.AddUser(user);
-            
+
             return Results.StatusCode((int)HttpStatusCode.Created);
 
         }
@@ -39,11 +39,16 @@ namespace MusicAPI.Handlers
             }
             if (!artistHelper.CheckIfSongExists(songId))
             {
-                return Results.NotFound($"user {songId} not found");
+                return Results.NotFound($"song {songId} not found");
             }
-            // om jag gör try-catch här och den throws an exception,
-            // kan jag göra catch här på den och returnera BadRequest?
-            userHelper.ConnectSongToUser(userId, songId);
+            try
+            {
+                userHelper.ConnectSongToUser(userId, songId);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }

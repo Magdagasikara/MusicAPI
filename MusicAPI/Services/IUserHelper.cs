@@ -58,9 +58,6 @@ namespace MusicAPI.Services
 
         public void ConnectSongToUser(int userId, int songId)
         {
-            // funderar på om jag ska returnera bool om det gick bra eller inte
-            // istället för exception
-
             User? user = _context.Users
                 .Include(u => u.Songs)
                 .SingleOrDefault(u => u.Id == userId);
