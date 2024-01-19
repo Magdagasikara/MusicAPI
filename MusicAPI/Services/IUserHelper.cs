@@ -2,6 +2,7 @@
 using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicAPI.Services
 {
@@ -13,7 +14,7 @@ namespace MusicAPI.Services
         public void ConnectSongToUser(int userId, int songId);
         public void ConnectArtistToUser(int userId, int artistId);
         public void ConnectGenreToUser(int userId, int genreId);
-        public bool CheckIfUserIdExists(int userId);
+        public bool CheckIfUserExists(int userId);
     }
 
     public class UserHelper : IUserHelper
@@ -57,10 +58,26 @@ namespace MusicAPI.Services
 
         public void ConnectSongToUser(int userId, int songId)
         {
+            // funderar på om jag ska returnera bool om det gick bra eller inte
+            // istället för exception
 
+            User? user = _context.Users
+                .Include(u => u.Songs)
+                .SingleOrDefault(u => u.Id == userId);
 
+            Song? song = _context.Songs
+                .SingleOrDefault(s => s.Id == songId);
 
-            throw new NotImplementedException();
+            user.Songs.Add(song);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception($"Unable to connect userId {userId} with songId {songId}");
+            }
         }
 
         public void ConnectArtistToUser(int userId, int artistId)
@@ -73,13 +90,13 @@ namespace MusicAPI.Services
             throw new NotImplementedException();
         }
 
-        public bool CheckIfUserIdExists(int userId)
+        public bool CheckIfUserExists(int userId)
         {
             User user = _context.Users.FirstOrDefault(u => u.Id == userId);
-            
-            if (user == null)
+
+            if (user is null)
                 return false;
-            
+
             return true;
 
         }

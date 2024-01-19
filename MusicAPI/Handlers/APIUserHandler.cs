@@ -33,15 +33,18 @@ namespace MusicAPI.Handlers
         }
         public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper, IArtistHelper artistHelper)
         {
-            if (!userHelper.CheckIfUserIdExists(userId))
+            if (!userHelper.CheckIfUserExists(userId))
             {
                 return Results.NotFound($"user {userId} not found");
             }
-            if (!artistHelper.CheckIfSongIdExists(songId))
+            if (!artistHelper.CheckIfSongExists(songId))
             {
                 return Results.NotFound($"user {songId} not found");
             }
+            // om jag gör try-catch här och den throws an exception,
+            // kan jag göra catch här på den och returnera BadRequest?
             userHelper.ConnectSongToUser(userId, songId);
+
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult ConnectArtistToUser(int userId, int artistId, IUserHelper userHelper)
