@@ -18,13 +18,29 @@ namespace MusicAPI.Handlers
             var user = userHelper.GetUser(userId);
             return Results.Json(user);
         }
-        public static IResult AddUser(UserDto userDto, IUserHelper userHelper)
+        public static IResult AddUser(UserDto user, IUserHelper userHelper)
         {
-            userHelper.AddUser(userDto);
+
+            if (user.Name == null)
+            {
+                return Results.BadRequest(new { Message = "User needs to have a name" });
+            }
+
+            userHelper.AddUser(user);
+            
             return Results.StatusCode((int)HttpStatusCode.Created);
+
         }
-        public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper)
+        public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper, IArtistHelper artistHelper)
         {
+            if (!userHelper.CheckIfUserIdExists(userId))
+            {
+                return Results.NotFound($"user {userId} not found");
+            }
+            if (!artistHelper.CheckIfSongIdExists(songId))
+            {
+                return Results.NotFound($"user {songId} not found");
+            }
             userHelper.ConnectSongToUser(userId, songId);
             return Results.StatusCode((int)HttpStatusCode.Created);
         }

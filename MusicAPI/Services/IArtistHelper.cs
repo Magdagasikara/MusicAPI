@@ -1,6 +1,7 @@
 ﻿using MusicAPI.Models.Dtos;
 using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
+using MusicAPI.Models;
 
 namespace MusicAPI.Services
 {
@@ -12,6 +13,7 @@ namespace MusicAPI.Services
         public List<ArtistsViewModel> GetArtists(int userId);
         public List<GenresViewModel> GetGenres(int userId);
         public List<SongsViewModel> GetSongs(int userId);
+        public bool CheckIfSongIdExists(int songId);
     }
 
     public class ArtistHelper : IArtistHelper
@@ -50,6 +52,17 @@ namespace MusicAPI.Services
         public List<SongsViewModel> GetSongs(int userId)
         {
             throw new NotImplementedException();
+        }
+
+        public bool CheckIfSongIdExists(int songId)
+        {
+            Song song = _context.Songs.FirstOrDefault(s => s.Id == songId);
+
+            if (song == null)
+                return false;
+
+            return true;
+
         }
     }
 }
