@@ -13,7 +13,6 @@ namespace MusicAPI.Services
         public List<ArtistsViewModel> GetArtists(int userId);
         public List<GenresViewModel> GetGenres(int userId);
         public List<SongsViewModel> GetSongs(int userId);
-        public bool CheckIfSongExists(int songId);
     }
 
     public class ArtistHelper : IArtistHelper
@@ -54,15 +53,5 @@ namespace MusicAPI.Services
             throw new NotImplementedException();
         }
 
-        public bool CheckIfSongExists(int songId)
-        {
-            Song song = _context.Songs.FirstOrDefault(s => s.Id == songId);
-
-            if (song is null)
-                return false;
-
-            return true;
-
-        }
     }
 }

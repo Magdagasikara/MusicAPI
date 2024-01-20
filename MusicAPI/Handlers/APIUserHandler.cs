@@ -1,4 +1,5 @@
 ﻿using MusicAPI.Data;
+using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
 using MusicAPI.Services;
 using System.Net;
@@ -33,17 +34,13 @@ namespace MusicAPI.Handlers
         }
         public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper, IArtistHelper artistHelper)
         {
-            if (!userHelper.CheckIfUserExists(userId))
-            {
-                return Results.NotFound($"user {userId} not found");
-            }
-            if (!artistHelper.CheckIfSongExists(songId))
-            {
-                return Results.NotFound($"song {songId} not found");
-            }
             try
             {
                 userHelper.ConnectSongToUser(userId, songId);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
             }
             catch (Exception ex)
             {
@@ -54,7 +51,19 @@ namespace MusicAPI.Handlers
         }
         public static IResult ConnectArtistToUser(int userId, int artistId, IUserHelper userHelper)
         {
-            userHelper.ConnectArtistToUser(userId, artistId);
+            try
+            {
+                userHelper.ConnectArtistToUser(userId, artistId);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper)

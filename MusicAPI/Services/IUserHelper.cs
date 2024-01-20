@@ -14,7 +14,6 @@ namespace MusicAPI.Services
         public void ConnectSongToUser(int userId, int songId);
         public void ConnectArtistToUser(int userId, int artistId);
         public void ConnectGenreToUser(int userId, int genreId);
-        public bool CheckIfUserExists(int userId);
     }
 
     public class UserHelper : IUserHelper
@@ -61,9 +60,15 @@ namespace MusicAPI.Services
             User? user = _context.Users
                 .Include(u => u.Songs)
                 .SingleOrDefault(u => u.Id == userId);
+            
+            if (user is null) 
+                throw new ArgumentNullException($"User {userId} not found");
 
             Song? song = _context.Songs
                 .SingleOrDefault(s => s.Id == songId);
+            
+            if (song is null)
+                throw new ArgumentNullException($"Song {songId} not found");
 
             user.Songs.Add(song);
 
@@ -79,7 +84,30 @@ namespace MusicAPI.Services
 
         public void ConnectArtistToUser(int userId, int artistId)
         {
-            throw new NotImplementedException();
+
+            User? user = _context.Users
+                .Include(u => u.Artists)
+                .SingleOrDefault(u => u.Id == userId);
+
+            if (user is null)
+                throw new ArgumentNullException($"User {userId} not found");
+
+            Artist? artist= _context.Artists
+                .SingleOrDefault(a => a.Id == artistId);
+
+            if (artist is null)
+                throw new ArgumentNullException($"Artist {artistId} not found");
+
+            user.Artists.Add(artist);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception($"Unable to connect userId {userId} with artistId {artistId}");
+            }
         }
 
         public void ConnectGenreToUser(int userId, int genreId)
@@ -87,15 +115,5 @@ namespace MusicAPI.Services
             throw new NotImplementedException();
         }
 
-        public bool CheckIfUserExists(int userId)
-        {
-            User user = _context.Users.FirstOrDefault(u => u.Id == userId);
-
-            if (user is null)
-                return false;
-
-            return true;
-
-        }
     }
 }
