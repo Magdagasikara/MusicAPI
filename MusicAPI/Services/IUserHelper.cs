@@ -2,6 +2,7 @@
 using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicAPI.Services
 {
@@ -27,12 +28,26 @@ namespace MusicAPI.Services
         {
             List<User> viewUsers = _context.Users.ToList();
 
+            if (viewUsers == null)
+                throw new ArgumentNullException($"No users found");
+
             return viewUsers;
         }
 
         public User GetUser(int userId)
         {
-            throw new NotImplementedException();
+            var user = _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new User
+                {
+                    Name = u.Name,
+                })
+                .FirstOrDefault();
+
+            if (user == null)
+                throw new ArgumentNullException($"No user with id:{userId} found");
+
+            return user;
         }
         public void AddUser(UserDto userDto)
         {
@@ -44,14 +59,36 @@ namespace MusicAPI.Services
             throw new NotImplementedException();
         }
 
-        public void ConnectGenreToUser(int userId, int genreId)
+        public void ConnectSongToUser(int userId, int songId)
         {
             throw new NotImplementedException();
         }
 
-        public void ConnectSongToUser(int userId, int songId)
+        public void ConnectGenreToUser(int userId, int genreId)
         {
-            throw new NotImplementedException();
+            User? user = _context.Users
+                .Include(u => u.Genres)
+                .SingleOrDefault(u => u.Id == userId);
+
+            if (user == null)
+                throw new ArgumentNullException($"User{userId} not found");
+
+            Genre? genre = _context.Genres
+                .SingleOrDefault(g => g.Id == genreId);
+
+            if (genre == null)
+                throw new ArgumentNullException($"Genre{genreId} not found");
+
+            try
+            {
+                _context.Genres.Add(genre);
+                _context.SaveChanges();
+            }
+
+            catch
+            {
+                throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
+            }
         }
     }
 }

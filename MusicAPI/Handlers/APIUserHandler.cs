@@ -33,11 +33,10 @@ namespace MusicAPI.Handlers
             userHelper.ConnectArtistToUser(userId, artistId);
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper)
+        public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper, IArtistHelper artistHelper)
         {
             userHelper.ConnectGenreToUser(userId, genreId);
             return Results.StatusCode((int)HttpStatusCode.Created);
-
         }
     }
 }
