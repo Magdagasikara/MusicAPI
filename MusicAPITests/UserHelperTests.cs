@@ -48,6 +48,27 @@ namespace MusicAPITests
             var dbContextOptions = new DbContextOptionsBuilder<ApplicationContext>()
                 .UseInMemoryDatabase(databaseName: "UserInDatabase")
                 .Options;
+
+            using (var context = new ApplicationContext(dbContextOptions))
+            {
+                var testUser = new User { Id = 1, Name = "TestUser" };
+                context.Users.Add(testUser);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApplicationContext(dbContextOptions))
+            {
+                var userRepository = new UserHelper(context);
+
+                // Act
+                int userId = 1; 
+                User result = userRepository.GetUser(userId);
+
+                // Assert
+                Assert.IsNotNull(result);
+                Assert.AreEqual(userId, result.Id); 
+                Assert.AreEqual("TestUser", result.Name);
+            }
         }
     }
 }
