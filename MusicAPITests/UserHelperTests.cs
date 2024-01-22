@@ -61,13 +61,46 @@ namespace MusicAPITests
                 var userRepository = new UserHelper(context);
 
                 // Act
-                int userId = 1; 
+                int userId = 1;
                 User result = userRepository.GetUser(userId);
 
                 // Assert
                 Assert.IsNotNull(result);
-                Assert.AreEqual(userId, result.Id); 
+                Assert.AreEqual(userId, result.Id);
                 Assert.AreEqual("TestUser", result.Name);
+            }
+        }
+
+        [TestMethod]
+        public void ConnectGenreToUser_ShouldLinkUserWithGenre()
+        {
+            // Arrange
+            var dbContextOptions = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase(databaseName: "InMemoryDatabase")
+                .Options;
+
+            using (var context = new ApplicationContext(dbContextOptions))
+            {
+                var testUser = new User { Id = 1, Name = "TestUser" };
+                var testGenre = new Genre { Id = 1, Title = "TestGenre" };
+                context.Users.Add(testUser);
+                context.Genres.Add(testGenre);
+                context.SaveChanges();
+            }
+
+            using (var context = new ApplicationContext(dbContextOptions))
+            {
+                var userRepository = new UserHelper(context);
+
+                // Act
+                int userId = 1;
+                int genreId = 1;
+                userRepository.ConnectGenreToUser(userId, genreId);
+
+                // Assert
+                var linkedUser = context.Users.Include(u => u.Genres).FirstOrDefault(u => u.Id == userId);
+                Assert.IsNotNull(linkedUser);
+                Assert.IsTrue(linkedUser.Genres.Any(g => g.Id == genreId));
             }
         }
     }
