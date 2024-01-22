@@ -12,9 +12,16 @@ namespace MusicAPI.Handlers
             artistHelper.AddArtist(artistDto, genreId);
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult AddSong(SongDto songDto, int artistId, IArtistHelper artistHelper)
+        public static IResult AddSong(SongDto songDto, int artistId, int genreId, IArtistHelper artistHelper)
         {
-            artistHelper.AddSong(songDto, artistId);
+            try
+            {
+                artistHelper.AddSong(songDto, artistId, genreId);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to add song {ex.Message}");
+            }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult AddGenre(GenreDto genreDto, IArtistHelper artistHelper)
@@ -24,13 +31,27 @@ namespace MusicAPI.Handlers
         }
         public static IResult GetArtists(int userId, IArtistHelper artistHelper)
         {
-            var artists = artistHelper.GetArtists(userId);
-            return Results.Json(artists);
+            try
+            {
+                artistHelper.GetArtists(userId);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to get artists {ex.Message}");
+            }
+            return Results.Json(artistHelper.GetArtists(userId));
         }
         public static IResult GetGenres(int userId, IArtistHelper artistHelper)
         {
-            var genres = artistHelper.GetGenres(userId);
-            return Results.Json(genres);
+            try
+            {
+                artistHelper.GetGenres(userId);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to get genres {ex.Message}");
+            }
+            return Results.Json(artistHelper.GetGenres(userId));
         }
         public static IResult GetSongs(int userId, IArtistHelper artistHelper)
         {
