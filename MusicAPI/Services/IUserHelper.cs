@@ -37,6 +37,10 @@ namespace MusicAPI.Services
         }
         public void AddUser(UserDto user)
         {
+            
+            if (_context.Users.Any(u => u.Name == user.Name))
+                throw new Exception($"User with name {user.Name} already exists in the database");
+
             _context.Users
                 .Add(new User()
                 {

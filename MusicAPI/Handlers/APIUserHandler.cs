@@ -27,12 +27,19 @@ namespace MusicAPI.Handlers
                 return Results.BadRequest(new { Message = "User needs to have a name" });
             }
 
-            userHelper.AddUser(user);
+            try
+            {
+                userHelper.AddUser(user);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
 
             return Results.StatusCode((int)HttpStatusCode.Created);
 
         }
-        public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper, IArtistHelper artistHelper)
+        public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper)
         {
             try
             {
