@@ -13,6 +13,10 @@ namespace MusicAPI
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddScoped<IArtistHelper, ArtistHelper>();
+            builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c =>
+            {
+                c.BaseAddress = new Uri("https://accounts.spotify.com/api/");
+            });
 
             var app = builder.Build();
 
