@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.Handlers;
+using MusicAPI.Services;
 
 namespace MusicAPI
 {
@@ -10,15 +12,13 @@ namespace MusicAPI
             var builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddScoped<IArtistHelper, ArtistHelper>();
 
             var app = builder.Build();
 
             app.MapGet("/", () => "Hello World!");
 
-            app.MapGet("/Users", () =>
-            {
-                
-            });
+            app.MapGet("/getartists/{userId}", APIArtistHandler.GetGenres);
 
             app.Run();
         }
