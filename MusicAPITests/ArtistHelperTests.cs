@@ -44,9 +44,6 @@ namespace MusicAPITests
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count());
             Assert.IsTrue(result.All(a => a.Users?.Any(u => u.Id == user.Id) == true));
-
-            // Make sure the database did not save anything
-            context.Database.EnsureDeleted(); 
         }
 
         [TestMethod]
@@ -73,9 +70,6 @@ namespace MusicAPITests
             // Assert
             Assert.AreEqual(1, context.Songs.Count());
             Assert.AreEqual("TestSong", context.Songs.SingleOrDefault().Name);
-
-            // Make sure the database did not save anything
-            context.Database.EnsureDeleted();
         }
 
         [TestMethod]
@@ -108,9 +102,6 @@ namespace MusicAPITests
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count());
             Assert.IsTrue(result.All(g => g.Users?.Any(u => u.Id == user.Id) == true));
-
-            // Make sure the database did not save anything
-            context.Database.EnsureDeleted();
         }
     }
 }
