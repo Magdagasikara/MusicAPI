@@ -29,8 +29,6 @@ namespace MusicAPITests
             Artist artist1 = new Artist() { Id = 1, Name = "Test_Artist1", Description = "Test_Description1", Users = new List<User>() };
             Artist artist2 = new Artist() { Id = 2, Name = "Test_Artist2", Description = "Test_Description2", Users = new List<User>() };
 
-            artist1.Users.Add(user);
-            artist2.Users.Add(user);
             user.Artists.Add(artist1);
             user.Artists.Add(artist2);
 
@@ -74,7 +72,7 @@ namespace MusicAPITests
             
             // Assert
             Assert.AreEqual(1, context.Songs.Count());
-            Assert.AreEqual("TestSong", context.Songs.First().Name);
+            Assert.AreEqual("TestSong", context.Songs.SingleOrDefault().Name);
 
             // Make sure the database did not save anything
             context.Database.EnsureDeleted();
@@ -95,10 +93,8 @@ namespace MusicAPITests
             Genre genre1 = new Genre() { Id = 1, Title = "Test_Title1", Users = new List<User>() };
             Genre genre2 = new Genre() { Id = 2, Title = "Test_Title2", Users = new List<User>() };
 
-            genre1.Users.Add(user);
-            genre2.Users.Add(user);
             user.Genres.Add(genre1);
-            user.Genres.Add(genre1);
+            user.Genres.Add(genre2);
 
             context.Genres.AddRange(genre1, genre2);
             context.Users.Add(user);
