@@ -9,7 +9,7 @@ namespace MusicAPI.Services
     public interface IUserHelper
     {
         public List<User> GetAllUsers();
-        public User GetUser(int userId);
+        public UsersViewModel GetUser(int userId);
         public void AddUser(UserDto userDto);
         public void ConnectSongToUser(int userId, int songId);
         public void ConnectArtistToUser(int userId, int artistId);
@@ -28,12 +28,26 @@ namespace MusicAPI.Services
         {
             List<User> viewUsers = _context.Users.ToList();
 
+            if (viewUsers == null)
+                throw new ArgumentNullException($"No users found");
+
             return viewUsers;
         }
 
-        public User GetUser(int userId)
+        public UsersViewModel GetUser(int userId)
         {
-            throw new NotImplementedException();
+            var user = _context.Users
+                .Where(u => u.Id == userId)
+                .Select(u => new UsersViewModel
+                {
+                    Name = u.Name,
+                })
+                .FirstOrDefault();
+
+            if (user == null)
+                throw new ArgumentNullException($"No user with id:{userId} found");
+
+            return user;
         }
         public void AddUser(UserDto user)
         {
@@ -116,7 +130,29 @@ namespace MusicAPI.Services
 
         public void ConnectGenreToUser(int userId, int genreId)
         {
-            throw new NotImplementedException();
+            User? user = _context.Users
+                .Include(u => u.Genres)
+                .SingleOrDefault(u => u.Id == userId);
+
+            if (user == null)
+                throw new ArgumentNullException($"User{userId} not found");
+
+            Genre? genre = _context.Genres
+                .SingleOrDefault(g => g.Id == genreId);
+
+            if (genre == null)
+                throw new ArgumentNullException($"Genre{genreId} not found");
+
+            try
+            {
+                user.Genres.Add(genre);
+                _context.SaveChanges();
+            }
+
+            catch 
+            {
+                throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
+            }
         }
 
     }
