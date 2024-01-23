@@ -48,6 +48,7 @@ namespace MusicAPITests
             Assert.AreEqual(1, context.Users.SingleOrDefault().Songs.Count());
             Assert.AreEqual("TestUser", context.Users.SingleOrDefault().Name);
             Assert.AreEqual("TestSong", context.Users.SingleOrDefault().Songs.SingleOrDefault().Name);
+            Assert.IsTrue(context.Songs.SingleOrDefault().Id == context.Users.SingleOrDefault().Songs.SingleOrDefault().Id);
 
         }
 
