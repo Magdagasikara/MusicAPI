@@ -11,13 +11,30 @@ namespace MusicAPI.Handlers
     {
         public static IResult GetAllUsers(IUserHelper userHelper)
         {
-            var users = userHelper.GetAllUsers();
-            return Results.Json(users);
+            try
+            {
+                var users = userHelper.GetAllUsers();
+                return Results.Json(users);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            
+
         }
         public static IResult GetUser(int userId, IUserHelper userHelper)
         {
-            var user = userHelper.GetUser(userId);
-            return Results.Json(user);
+            try
+            {
+                var user = userHelper.GetUser(userId);
+                return Results.Json(user);
+            }
+            catch(UserNotFoundException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            
         }
         public static IResult AddUser(UserDto user, IUserHelper userHelper)
         {
@@ -45,7 +62,11 @@ namespace MusicAPI.Handlers
             {
                 userHelper.ConnectSongToUser(userId, songId);
             }
-            catch (ArgumentNullException ex)
+            catch (UserNotFoundException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (SongNotFoundException ex)
             {
                 return Results.NotFound($"Exception {ex.Message}");
             }
@@ -62,7 +83,11 @@ namespace MusicAPI.Handlers
             {
                 userHelper.ConnectArtistToUser(userId, artistId);
             }
-            catch (ArgumentNullException ex)
+            catch (UserNotFoundException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (ArtistNotFoundException ex)
             {
                 return Results.NotFound($"Exception {ex.Message}");
             }
@@ -75,7 +100,23 @@ namespace MusicAPI.Handlers
         }
         public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper, IArtistHelper artistHelper)
         {
-            userHelper.ConnectGenreToUser(userId, genreId);
+            try
+            {
+                userHelper.ConnectGenreToUser(userId, genreId);
+            }
+            catch (UserNotFoundException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (GenreNotFoundException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
     }
