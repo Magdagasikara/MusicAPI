@@ -133,8 +133,8 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConnectSongToUser_ThrowsNullExceptionWhenNoSuchUser()
+        [ExpectedException(typeof(UserNotFoundException))]
+        public void ConnectSongToUser_ThrowsUserNotFoundException()
         {
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
                 .UseInMemoryDatabase("TestDb_ConnectSongToUser_2")
@@ -149,8 +149,8 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConnectSongToUser_ThrowsNullExceptionWhenNoSuchSong()
+        [ExpectedException(typeof(SongNotFoundException))]
+        public void ConnectSongToUser_ThrowsSongNotFoundException()
         {
 
             // Arrange
@@ -199,8 +199,8 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConnectArtistToUser_ThrowsNullExceptionWhenNoSuchUser()
+        [ExpectedException(typeof(UserNotFoundException))]
+        public void ConnectArtistToUser_ThrowsUserNotFoundException()
         {
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
                 .UseInMemoryDatabase("TestDb_ConnectArtistToUser_2")
@@ -215,8 +215,8 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public void ConnectArtistToUser_ThrowsNullExceptionWhenNoSuchArtist()
+        [ExpectedException(typeof(ArtistNotFoundException))]
+        public void ConnectArtistToUser_ThrowsArtistNotFoundException()
         {
 
             // Arrange

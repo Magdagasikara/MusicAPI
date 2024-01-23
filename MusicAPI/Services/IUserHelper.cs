@@ -45,7 +45,7 @@ namespace MusicAPI.Services
                 .FirstOrDefault();
 
             if (user == null)
-                throw new ArgumentNullException($"No user with id:{userId} found");
+                throw new UserNotFoundException();
 
             return user;
         }
@@ -80,13 +80,13 @@ namespace MusicAPI.Services
                 .SingleOrDefault(u => u.Id == userId);
             
             if (user is null) 
-                throw new ArgumentNullException($"User {userId} not found");
+                throw new UserNotFoundException();
 
             Song? song = _context.Songs
                 .SingleOrDefault(s => s.Id == songId);
             
             if (song is null)
-                throw new ArgumentNullException($"Song {songId} not found");
+                throw new SongNotFoundException();
 
             user.Songs.Add(song);
 
@@ -108,13 +108,13 @@ namespace MusicAPI.Services
                 .SingleOrDefault(u => u.Id == userId);
 
             if (user is null)
-                throw new ArgumentNullException($"User {userId} not found");
+                throw new UserNotFoundException();
 
             Artist? artist= _context.Artists
                 .SingleOrDefault(a => a.Id == artistId);
 
             if (artist is null)
-                throw new ArgumentNullException($"Artist {artistId} not found");
+                throw new ArtistNotFoundException();
 
             user.Artists.Add(artist);
 
@@ -135,13 +135,13 @@ namespace MusicAPI.Services
                 .SingleOrDefault(u => u.Id == userId);
 
             if (user == null)
-                throw new ArgumentNullException($"User{userId} not found");
+                throw new UserNotFoundException();
 
             Genre? genre = _context.Genres
                 .SingleOrDefault(g => g.Id == genreId);
 
             if (genre == null)
-                throw new ArgumentNullException($"Genre{genreId} not found");
+                throw new GenreNotFoundException();
 
             try
             {

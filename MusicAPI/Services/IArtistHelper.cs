@@ -36,10 +36,10 @@ namespace MusicAPI.Services
         public void AddSong(SongDto songDto, int artistId, int genreId)
         {
             var artist = _context.Artists.SingleOrDefault(a => a.Id == artistId)
-            ?? throw new Exception($"Artist with Id {artistId} could not be found");
+            ?? throw new ArtistNotFoundException();
 
             var genre = _context.Genres.SingleOrDefault(g => g.Id == genreId)
-            ?? throw new Exception($"Genre with id {genreId} could not be found");
+            ?? throw new GenreNotFoundException();
 
             var newSong = new Song
             {
@@ -63,7 +63,7 @@ namespace MusicAPI.Services
 
             if (user == null)
             {
-                throw new Exception($"No user with Id: {userId}");
+                throw new UserNotFoundException();
             }
 
             if (user.Artists == null || user.Artists.Count == 0)
@@ -98,7 +98,7 @@ namespace MusicAPI.Services
 
             if (user == null)
             {
-                throw new Exception($"No user with Id: {userId}");
+                throw new UserNotFoundException();
             }
 
             if (user.Genres.Count == 0)
