@@ -1,4 +1,5 @@
 ﻿using MusicAPI.Data;
+using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
 using MusicAPI.Services;
 using System.Net;
@@ -18,19 +19,58 @@ namespace MusicAPI.Handlers
             var user = userHelper.GetUser(userId);
             return Results.Json(user);
         }
-        public static IResult AddUser(UserDto userDto, IUserHelper userHelper)
+        public static IResult AddUser(UserDto user, IUserHelper userHelper)
         {
-            userHelper.AddUser(userDto);
+
+            if (user.Name == null)
+            {
+                return Results.BadRequest(new { Message = "User needs to have a name" });
+            }
+
+            try
+            {
+                userHelper.AddUser(user);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
             return Results.StatusCode((int)HttpStatusCode.Created);
+
         }
         public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper)
         {
-            userHelper.ConnectSongToUser(userId, songId);
+            try
+            {
+                userHelper.ConnectSongToUser(userId, songId);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult ConnectArtistToUser(int userId, int artistId, IUserHelper userHelper)
         {
-            userHelper.ConnectArtistToUser(userId, artistId);
+            try
+            {
+                userHelper.ConnectArtistToUser(userId, artistId);
+            }
+            catch (ArgumentNullException ex)
+            {
+                return Results.NotFound($"Exception {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper, IArtistHelper artistHelper)

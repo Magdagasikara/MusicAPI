@@ -49,19 +49,83 @@ namespace MusicAPI.Services
 
             return user;
         }
-        public void AddUser(UserDto userDto)
+        public void AddUser(UserDto user)
         {
-            throw new NotImplementedException();
+            
+            if (_context.Users.Any(u => u.Name == user.Name))
+                throw new Exception($"User with name {user.Name} already exists in the database");
+
+            _context.Users
+                .Add(new User()
+                {
+                    Name = user.Name,
+                });
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception("Unable to save user to database");
+            }
+
+        }
+
+
+        public void ConnectSongToUser(int userId, int songId)
+        {
+            User? user = _context.Users
+                .Include(u => u.Songs)
+                .SingleOrDefault(u => u.Id == userId);
+            
+            if (user is null) 
+                throw new ArgumentNullException($"User {userId} not found");
+
+            Song? song = _context.Songs
+                .SingleOrDefault(s => s.Id == songId);
+            
+            if (song is null)
+                throw new ArgumentNullException($"Song {songId} not found");
+
+            user.Songs.Add(song);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception($"Unable to connect userId {userId} with songId {songId}");
+            }
         }
 
         public void ConnectArtistToUser(int userId, int artistId)
         {
-            throw new NotImplementedException();
-        }
 
-        public void ConnectSongToUser(int userId, int songId)
-        {
-            throw new NotImplementedException();
+            User? user = _context.Users
+                .Include(u => u.Artists)
+                .SingleOrDefault(u => u.Id == userId);
+
+            if (user is null)
+                throw new ArgumentNullException($"User {userId} not found");
+
+            Artist? artist= _context.Artists
+                .SingleOrDefault(a => a.Id == artistId);
+
+            if (artist is null)
+                throw new ArgumentNullException($"Artist {artistId} not found");
+
+            user.Artists.Add(artist);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception($"Unable to connect userId {userId} with artistId {artistId}");
+            }
         }
 
         public void ConnectGenreToUser(int userId, int genreId)
@@ -90,5 +154,6 @@ namespace MusicAPI.Services
                 throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
             }
         }
+
     }
 }
