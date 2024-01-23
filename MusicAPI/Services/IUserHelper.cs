@@ -9,7 +9,7 @@ namespace MusicAPI.Services
     public interface IUserHelper
     {
         public List<User> GetAllUsers();
-        public User GetUser(int userId);
+        public UsersViewModel GetUser(int userId);
         public void AddUser(UserDto userDto);
         public void ConnectSongToUser(int userId, int songId);
         public void ConnectArtistToUser(int userId, int artistId);
@@ -34,11 +34,11 @@ namespace MusicAPI.Services
             return viewUsers;
         }
 
-        public User GetUser(int userId)
+        public UsersViewModel GetUser(int userId)
         {
             var user = _context.Users
                 .Where(u => u.Id == userId)
-                .Select(u => new User
+                .Select(u => new UsersViewModel
                 {
                     Name = u.Name,
                 })
@@ -81,11 +81,11 @@ namespace MusicAPI.Services
 
             try
             {
-                _context.Genres.Add(genre);
+                user.Genres.Add(genre);
                 _context.SaveChanges();
             }
 
-            catch
+            catch 
             {
                 throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
             }
