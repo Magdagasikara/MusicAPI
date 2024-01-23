@@ -7,7 +7,7 @@ namespace MusicAPI.Services
 {
     public interface IArtistHelper
     {
-        public void AddArtist(ArtistDto artistDto, int genreId);
+        public void AddArtist(ArtistDto artistDto);
         public void AddSong(SongDto songDto, int artistId, int genreId);
         public void AddGenre(GenreDto genreDto);
         public List<ArtistsViewModel> GetArtists(int userId);
@@ -25,12 +25,49 @@ namespace MusicAPI.Services
 
         public void AddGenre(GenreDto genreDto)
         {
-            throw new NotImplementedException();
+            if (_context.Genres.Any(g => g.Title == genreDto.Title))
+            {
+                throw new Exception($"Genre with Title {genreDto.Title} allready exists");
+            }
+
+            else
+            {
+                Genre? newGenre = new Genre
+                {
+                    Title = genreDto.Title
+                };
+
+                _context.Genres.Add(newGenre);
+                
+                try
+                {
+                    _context.SaveChanges();
+                }
+                catch
+                {
+                    throw new Exception("Unable to save Genre to database");
+                }
+            }
         }
 
-        public void AddArtist(ArtistDto artistDto, int genreId)
+        public void AddArtist(ArtistDto artistDto)
         {
-            throw new NotImplementedException();
+            Artist? newArtist = new Artist
+            {
+                Name = artistDto.Name,
+                Description = artistDto.Description
+            };
+
+            _context.Artists.Add(newArtist);
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception("Unable to save Genre to database");
+            }
         }
 
         public void AddSong(SongDto songDto, int artistId, int genreId)
@@ -123,8 +160,27 @@ namespace MusicAPI.Services
 
         public List<SongsViewModel> GetSongs(int userId)
         {
+            var user = _context.Users.SingleOrDefault(u => u.Id == userId);
+
+            if (user == null)
+            {
+                throw new Exception($"No user with Id: {userId}");
+            }
+
+            List<Song>? userSongs = _context.Users
+                .Where(u => u.Id == userId)
+                .SelectMany(u => u.Songs)
+                .ToList();
+
+            List<SongsViewModel> songs = userSongs
+                .Select(s => new SongsViewModel
+                {
+                    Name = s.Name
+                }).ToList();
+
+            return songs;
+
             throw new NotImplementedException();
         }
-
     }
 }

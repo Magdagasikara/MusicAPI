@@ -1,4 +1,5 @@
 ﻿using MusicAPI.Data;
+using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
 using MusicAPI.Services;
 using System.Net;
@@ -7,9 +8,16 @@ namespace MusicAPI.Handlers
 {
     public class APIArtistHandler
     {
-        public static IResult AddArtist(ArtistDto artistDto, int genreId, IArtistHelper artistHelper)
+        public static IResult AddArtist(ArtistDto artistDto, IArtistHelper artistHelper)
         {
-            artistHelper.AddArtist(artistDto, genreId);
+            try
+            {
+                artistHelper.AddArtist(artistDto);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to add Genre {ex.Message}");
+            }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult AddSong(SongDto songDto, int artistId, int genreId, IArtistHelper artistHelper)
@@ -26,7 +34,14 @@ namespace MusicAPI.Handlers
         }
         public static IResult AddGenre(GenreDto genreDto, IArtistHelper artistHelper)
         {
-            artistHelper.AddGenre(genreDto);
+            try
+            {
+                artistHelper.AddGenre(genreDto);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to add Genre {ex.Message}");
+            }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
         public static IResult GetArtists(int userId, IArtistHelper artistHelper)
@@ -55,8 +70,16 @@ namespace MusicAPI.Handlers
         }
         public static IResult GetSongs(int userId, IArtistHelper artistHelper)
         {
-            var songs = artistHelper.GetSongs(userId);
-            return Results.Json(songs);
+            try
+            {
+                artistHelper.GetSongs(userId);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Unable to get songs {ex.Message}");
+            }
+            return Results.Json(artistHelper.GetSongs(userId));
+
         }
     }
 }
