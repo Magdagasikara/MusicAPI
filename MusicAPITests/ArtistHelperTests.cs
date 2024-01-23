@@ -43,7 +43,8 @@ namespace MusicAPITests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count());
-            Assert.IsTrue(result.All(a => a.Users?.Any(u => u.Id == user.Id) == true));
+            Assert.IsTrue(result.Any(a => a.Name == artist1.Name));
+            Assert.IsTrue(result.Any(a => a.Name == artist2.Name));
         }
 
         [TestMethod]
@@ -77,7 +78,7 @@ namespace MusicAPITests
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_AddSong")
+                .UseInMemoryDatabase("TestDb_GetGenres")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
             ArtistHelper artistHelper = new ArtistHelper(context);
@@ -101,7 +102,8 @@ namespace MusicAPITests
             // Assert
             Assert.IsNotNull(result);
             Assert.AreEqual(2, result.Count());
-            Assert.IsTrue(result.All(g => g.Users?.Any(u => u.Id == user.Id) == true));
+            Assert.IsTrue(result.Any(g => g.Title == genre1.Title));
+            Assert.IsTrue(result.Any(g => g.Title == genre2.Title));
         }
     }
 }

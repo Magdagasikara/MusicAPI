@@ -80,8 +80,7 @@ namespace MusicAPI.Services
                 .Select(a => new ArtistsViewModel
                 {
                     Name = a.Name,
-                    Description = a.Description,
-                    Users = a.Users
+                    Description = a.Description
                 })
                 .ToList();
 
@@ -115,8 +114,7 @@ namespace MusicAPI.Services
             List<GenresViewModel> genres = userGenres
                 .Select(g => new GenresViewModel
                 {
-                    Title = g.Title,
-                    Users = g.Users
+                    Title = g.Title
                 })
                 .ToList();
 
