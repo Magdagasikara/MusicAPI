@@ -1,18 +1,18 @@
 ﻿using MusicAPI.Data;
 using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
-using MusicAPI.Services;
+using MusicAPI.Repositories;
 using System.Net;
 
 namespace MusicAPI.Handlers
 {
     public class APIArtistHandler
     {
-        public static IResult AddArtist(ArtistDto artistDto, IArtistHelper artistHelper)
+        public static IResult AddArtist(ArtistDto artistDto, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.AddArtist(artistDto);
+                artistRepo.AddArtist(artistDto);
             }
             catch (Exception ex)
             {
@@ -20,11 +20,11 @@ namespace MusicAPI.Handlers
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult AddSong(SongDto songDto, int artistId, int genreId, IArtistHelper artistHelper)
+        public static IResult AddSong(SongDto songDto, int artistId, int genreId, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.AddSong(songDto, artistId, genreId);
+                artistRepo.AddSong(songDto, artistId, genreId);
             }
             catch (Exception ex)
             {
@@ -32,11 +32,11 @@ namespace MusicAPI.Handlers
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult AddGenre(GenreDto genreDto, IArtistHelper artistHelper)
+        public static IResult AddGenre(GenreDto genreDto, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.AddGenre(genreDto);
+                artistRepo.AddGenre(genreDto);
             }
             catch (Exception ex)
             {
@@ -44,41 +44,41 @@ namespace MusicAPI.Handlers
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult GetArtists(int userId, IArtistHelper artistHelper)
+        public static IResult GetArtists(int userId, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.GetArtists(userId);
+                artistRepo.GetArtists(userId);
             }
             catch (Exception ex)
             {
                 return Results.BadRequest($"Unable to get artists {ex.Message}");
             }
-            return Results.Json(artistHelper.GetArtists(userId));
+            return Results.Json(artistRepo.GetArtists(userId));
         }
-        public static IResult GetGenres(int userId, IArtistHelper artistHelper)
+        public static IResult GetGenres(int userId, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.GetGenres(userId);
+                artistRepo.GetGenres(userId);
             }
             catch (Exception ex)
             {
                 return Results.BadRequest($"Unable to get genres {ex.Message}");
             }
-            return Results.Json(artistHelper.GetGenres(userId));
+            return Results.Json(artistRepo.GetGenres(userId));
         }
-        public static IResult GetSongs(int userId, IArtistHelper artistHelper)
+        public static IResult GetSongs(int userId, IArtistRepository artistRepo)
         {
             try
             {
-                artistHelper.GetSongs(userId);
+                artistRepo.GetSongs(userId);
             }
             catch (Exception ex)
             {
                 return Results.BadRequest($"Unable to get songs {ex.Message}");
             }
-            return Results.Json(artistHelper.GetSongs(userId));
+            return Results.Json(artistRepo.GetSongs(userId));
 
         }
     }

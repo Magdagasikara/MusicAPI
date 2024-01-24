@@ -4,9 +4,9 @@ using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace MusicAPI.Services
+namespace MusicAPI.Repositories
 {
-    public interface IUserHelper
+    public interface IUserRepository
     {
         public List<User> GetAllUsers();
         public UsersViewModel GetUser(int userId);
@@ -16,10 +16,10 @@ namespace MusicAPI.Services
         public void ConnectGenreToUser(int userId, int genreId);
     }
 
-    public class UserHelper : IUserHelper
+    public class DbUserRepository : IUserRepository
     {
         private ApplicationContext _context;
-        public UserHelper(ApplicationContext context)
+        public DbUserRepository(ApplicationContext context)
         {
             _context = context;
         }

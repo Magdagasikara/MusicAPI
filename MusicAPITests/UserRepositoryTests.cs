@@ -4,11 +4,12 @@ using MusicAPI.Services;
 using MusicAPI.Models;
 using MusicAPI.Data;
 using MusicAPI.Models.Dtos;
+using MusicAPI.Repositories;
 
 namespace MusicAPITests
 {
     [TestClass]
-    public class UserHelperTests
+    public class UserRepositoryTests
     {
 
         [TestMethod]
@@ -20,7 +21,7 @@ namespace MusicAPITests
                 .Options;
 
             ApplicationContext context = new ApplicationContext(dbContextOptions);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             var testUser1 = new User { Id = 1, Name = "User1" };
             var testUser2 = new User { Id = 2, Name = "User2" };
@@ -52,7 +53,7 @@ namespace MusicAPITests
                 .Options;
 
             ApplicationContext context = new ApplicationContext(dbContextOptions);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             var testUser = new User { Id = 1, Name = "TestUser" };
             context.Users.Add(testUser);
@@ -74,7 +75,7 @@ namespace MusicAPITests
                 .Options;
 
             ApplicationContext context = new ApplicationContext(dbContextOptions);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             var testUser = new User { Id = 1, Name = "TestUser" };
             var testGenre = new Genre { Id = 1, Title = "TestGenre" };
@@ -98,7 +99,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_AddUser_1")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.AddUser(new UserDto() { Name = "TestUser" });
@@ -119,7 +120,7 @@ namespace MusicAPITests
             context.Users.Add(new User() { Name = "TestUser" });
             context.Songs.Add(new Song() { Name = "TestSong" });
             context.SaveChanges();
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectSongToUser(1, 1);
@@ -140,7 +141,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_ConnectSongToUser_2")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectSongToUser(1, 1);
@@ -160,7 +161,7 @@ namespace MusicAPITests
             ApplicationContext context = new ApplicationContext(options);
             context.Users.Add(new User { Name = "TestName" });
             context.SaveChanges();
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectSongToUser(1, 1);
@@ -186,7 +187,7 @@ namespace MusicAPITests
             context.Users.Add(new User() { Name = "TestUser" });
             context.Artists.Add(new Artist() { Name = "TestArtist", Description = "TestArtistDescription" });
             context.SaveChanges();
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectArtistToUser(1, 1);
@@ -206,7 +207,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_ConnectArtistToUser_2")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectArtistToUser(1, 1);
@@ -226,7 +227,7 @@ namespace MusicAPITests
             ApplicationContext context = new ApplicationContext(options);
             context.Users.Add(new User { Name = "TestName" });
             context.SaveChanges();
-            UserHelper userHelper = new UserHelper(context);
+            DbUserRepository userHelper = new DbUserRepository(context);
 
             // Act
             userHelper.ConnectArtistToUser(1, 1);
