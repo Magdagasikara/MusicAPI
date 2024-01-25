@@ -11,11 +11,12 @@ namespace MusicAPIClient
     {
         static async Task Main(string[] args)
         {
-            var context = new MusicAPI.Data.ApplicationContext();
-            var userHelper = new UserHelper(context);
-            var artistHelper = new ArtistHelper(context);
 
-            var loggedInUser = LogInUser(userHelper);
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://localhost:7181/");
+
+                var loggedInUser = LogInUser(userHelper);
 
             while (true)
             {
@@ -25,8 +26,9 @@ namespace MusicAPIClient
 
                 switch (userResponse)
                 {
+                        // These methods will be changed 
                     case "1":
-                        await userHelper.GetAllUsers(loggedInUser);
+                        await .GetAllUsers(loggedInUser);
                         break;
 
                     case "2":
