@@ -3,9 +3,9 @@ using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
 
-namespace MusicAPI.Services
+namespace MusicAPI.Repositories
 {
-    public interface IArtistHelper
+    public interface IArtistRepository
     {
         public void AddArtist(ArtistDto artistDto);
         public void AddSong(SongDto songDto, int artistId, int genreId);
@@ -15,10 +15,10 @@ namespace MusicAPI.Services
         public List<SongsViewModel> GetSongs(int userId);
     }
 
-    public class ArtistHelper : IArtistHelper
+    public class DbArtistRepository : IArtistRepository
     {
         private ApplicationContext _context;
-        public ArtistHelper(ApplicationContext context)
+        public DbArtistRepository(ApplicationContext context)
         {
             _context = context;
         }

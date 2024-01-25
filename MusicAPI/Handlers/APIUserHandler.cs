@@ -1,7 +1,7 @@
 ﻿using MusicAPI.Data;
 using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
-using MusicAPI.Services;
+using MusicAPI.Repositories;
 using System.Net;
 using System.Text;
 
@@ -9,11 +9,11 @@ namespace MusicAPI.Handlers
 {
     public static class APIUserHandler
     {
-        public static IResult GetAllUsers(IUserHelper userHelper)
+        public static IResult GetAllUsers(IUserRepository userRepo)
         {
             try
             {
-                var users = userHelper.GetAllUsers();
+                var users = userRepo.GetAllUsers();
                 return Results.Json(users);
             }
             catch (ArgumentNullException ex)
@@ -23,11 +23,11 @@ namespace MusicAPI.Handlers
             
 
         }
-        public static IResult GetUser(int userId, IUserHelper userHelper)
+        public static IResult GetUser(int userId, IUserRepository userRepo)
         {
             try
             {
-                var user = userHelper.GetUser(userId);
+                var user = userRepo.GetUser(userId);
                 return Results.Json(user);
             }
             catch(UserNotFoundException ex)
@@ -36,7 +36,7 @@ namespace MusicAPI.Handlers
             }
             
         }
-        public static IResult AddUser(UserDto user, IUserHelper userHelper)
+        public static IResult AddUser(UserDto user, IUserRepository userRepo)
         {
 
             if (user.Name == null)
@@ -46,7 +46,7 @@ namespace MusicAPI.Handlers
 
             try
             {
-                userHelper.AddUser(user);
+                userRepo.AddUser(user);
             }
             catch (Exception ex)
             {
@@ -56,11 +56,11 @@ namespace MusicAPI.Handlers
             return Results.StatusCode((int)HttpStatusCode.Created);
 
         }
-        public static IResult ConnectSongToUser(int userId, int songId, IUserHelper userHelper)
+        public static IResult ConnectSongToUser(int userId, int songId, IUserRepository userRepo)
         {
             try
             {
-                userHelper.ConnectSongToUser(userId, songId);
+                userRepo.ConnectSongToUser(userId, songId);
             }
             catch (UserNotFoundException ex)
             {
@@ -77,11 +77,11 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult ConnectArtistToUser(int userId, int artistId, IUserHelper userHelper)
+        public static IResult ConnectArtistToUser(int userId, int artistId, IUserRepository userRepo)
         {
             try
             {
-                userHelper.ConnectArtistToUser(userId, artistId);
+                userRepo.ConnectArtistToUser(userId, artistId);
             }
             catch (UserNotFoundException ex)
             {
@@ -98,7 +98,7 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult ConnectGenreToUser(int userId, int genreId, IUserHelper userHelper, IArtistHelper artistHelper)
+        public static IResult ConnectGenreToUser(int userId, int genreId, IUserRepository userHelper, IArtistRepository artistRepo)
         {
             try
             {

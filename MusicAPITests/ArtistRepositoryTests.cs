@@ -8,11 +8,12 @@ using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
 using MusicAPI.Services;
 using Microsoft.EntityFrameworkCore;
+using MusicAPI.Repositories;
 
 namespace MusicAPITests
 {
     [TestClass]
-    public class ArtistHelperTests
+    public class ArtistRepositoryTests
     {
         [TestMethod]
         public void GetArtists_GetsArtistsFromDb()
@@ -22,7 +23,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_GetArtists")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             User user = new User() { Id = 1, Name = "Test_User", Artists = new List<Artist>() };
 
@@ -55,7 +56,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_AddSong")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             Artist artist = new Artist() { Id = 1, Name = "Test_Artist", Description = "Test_Description" };
             Genre genre = new Genre() { Id = 1, Title = "Test_Genre", };
@@ -81,7 +82,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_GetGenres")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             User user = new User() { Id = 1, Name = "Test_User", Genres = new List<Genre>() };
 
@@ -114,7 +115,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_GetSongs1")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             User user = new User() { Name = "Test_User", Songs = new List<Song>() };
             Song song1 = new Song() { Name = "Test_Song1" };
@@ -145,7 +146,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_AddGenres")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             GenreDto genre = new GenreDto() { Title = "Test_Genre"};
 
@@ -165,7 +166,7 @@ namespace MusicAPITests
                 .UseInMemoryDatabase("TestDb_AddArtist")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
-            ArtistHelper artistHelper = new ArtistHelper(context);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             ArtistDto artist = new ArtistDto() { Name = "Test_Artist", Description = "Test_Description" };
 

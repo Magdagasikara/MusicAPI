@@ -1,4 +1,4 @@
-﻿namespace MusicAPI.Services
+﻿namespace MusicAPI.Repositories
 {
     public class UserNotFoundException: Exception
     {
