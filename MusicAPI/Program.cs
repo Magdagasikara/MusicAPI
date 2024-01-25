@@ -14,10 +14,8 @@ namespace MusicAPI
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
             builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
             builder.Services.AddScoped<IArtistRepository, DbArtistRepository>();
-            builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c =>
-            {
-                c.BaseAddress = new Uri("https://accounts.spotify.com/api/");
-            });
+            builder.Services.AddHttpClient<ISpotifyAccountHelper, SpotifyAccountHelper>(c => { c.BaseAddress = new Uri("https://accounts.spotify.com/api/"); });
+            builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c => { c.BaseAddress = new Uri("https://api.spotify.com/vi/"); c.DefaultRequestHeaders.Add("Accept", "application/.json"); });
 
             var app = builder.Build();
 

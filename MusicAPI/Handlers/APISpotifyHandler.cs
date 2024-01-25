@@ -1,33 +1,36 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using MusicAPI.Services;
+using System.Net;
 using System.Net.Http.Headers;
 
 namespace MusicAPI.Handlers
 {
-    public interface IAPISpotifyHandler
-    {
-        Task<string> GetAcessToken();
-        
-    }
     public class APISpotifyHandler
     {
-        private string? _acessToken;
-        private HttpClient _httpClient;
-        private string _clientId;
-        private string _clientSecret;
-        private DateTime _lastUpdatedToken;
-
-        public APISpotifyHandler(string clientId, string clientSecret) : this(new HttpClient(), clientId, clientSecret)
+        private readonly ISpotifyAccountHelper _spotifyAccountHelper;
+        private readonly IConfiguration _configuration;
+        private readonly ISpotifyHelper _spotifyHelper;
+        public APISpotifyHandler(ISpotifyAccountHelper spotifyAccountHelper, IConfiguration configuration, ISpotifyHelper spotifyHelper)
         {
-            
+            _spotifyAccountHelper = spotifyAccountHelper;
+            _configuration = configuration;
+            _spotifyHelper = spotifyHelper;
         }
 
-        public APISpotifyHandler(HttpClient httpClient, string clientId, string clientSecret)
+        public async Task<IResult> PopulateDatabaseFromSpotify(string searchQuery)
         {
-            _httpClient = httpClient;
-            _clientId = clientId;
-            _clientSecret = clientSecret;
-        }
+            try
+            {
+                var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
-        
+                var getArtistGenreAndTrack = await _spotifyHelper.GetArtistGenreAndTrack(token, searchQuery);
+            }
+            catch (Exception ex)
+            {
+                return Results.BadRequest($"Exception {ex.Message}");
+            }
+
+            return Results.StatusCode((int)HttpStatusCode.Created);
+        }
     }
 }
