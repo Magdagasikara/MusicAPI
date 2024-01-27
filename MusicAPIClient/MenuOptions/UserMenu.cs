@@ -11,76 +11,72 @@ namespace MusicAPIClient.MenuOptions
     public class UserMenu
     {
 
-        public static async Task UserMenuOptions()
+        public static async Task UserMenuOptions(HttpClient client, string username)
         {
             while (true)
             {
 
+                DisplayUserMenu(username);
                 string userResponse = Console.ReadLine();
 
-                DisplayUserMenu();
 
                 switch (userResponse)
                 {
 
                     case "1":
-                        await UserHandler.GetSongs(loggedInUser);
+                        await UserHandler.GetArtistsForUser(client, username);
                         break;
 
                     case "2":
-                        await UserHandler.GetArtists(loggedInUser);
+                        //await UserHandler.GetSongs(userId);
                         break;
 
                     case "3":
-                        await UserHandler.GetGenres(loggedInUser);
+                        //await UserHandler.GetGenres(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddSong
                     case "4":
-                        await UserHandler.ConnectSongToUser(loggedInUser);
+                        //await UserHandler.ConnectArtistToUser(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddGenre
                     case "5":
-                        await UserHandler.ConnectGenreToUser(loggedInUser);
+                        //await UserHandler.ConnectSongToUser(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddArtist
                     case "6":
-                        await UserHandler.ConnectArtistToUser(loggedInUser);
+                        //await UserHandler.ConnectGenreToUser(userId);                        
                         break;
 
-                    case "7":
+                    case "x":
+                    case "X":
                         return;
 
                     default:
-                        await Console.Out.WriteLineAsync("Invalid input, try again.");
+                        //await Console.Out.WriteLineAsync("Invalid input, try again.");
                         break;
 
                 }
             }
         }
 
-        static void DisplayUserMenu()
+        static void DisplayUserMenu(string username)
         {
-            Console.WriteLine("Welcome to Music API! Please enter:");
+            Console.Clear();
+            Console.WriteLine($"Welcome to Music API, {username}! Please enter:");
             Console.WriteLine("-----------------------------------_");
-            Console.WriteLine("1. To view all users");
-            Console.WriteLine("2. To view specific user");
-            Console.WriteLine("3. To add user");
-            Console.WriteLine("4. To add song");
-            Console.WriteLine("5. To add genre");
-            Console.WriteLine("6. To add artist");
-            Console.WriteLine("7. To add song to user");
-            Console.WriteLine("8. To add genre to user");
-            Console.WriteLine("9. To add artist to user");
-            Console.WriteLine("10. To view all user's songs");
-            Console.WriteLine("11. To view all user's artists");
-            Console.WriteLine("12. To view all user's genres");
-            Console.WriteLine("13. To exit.");
+            Console.WriteLine("1. To view all artists you like");
+            Console.WriteLine("2. To view all songs you like");
+            Console.WriteLine("3. To view all genres you like");
+            Console.WriteLine("4. To add a new artist to your collection");
+            Console.WriteLine("5. To add a new song to your collection");
+            Console.WriteLine("6. To add a new genre to your collection");
+            Console.WriteLine("X. To exit.");
         }
     }
 }

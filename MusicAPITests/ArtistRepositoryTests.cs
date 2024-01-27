@@ -16,7 +16,7 @@ namespace MusicAPITests
     public class ArtistRepositoryTests
     {
         [TestMethod]
-        public void GetArtists_GetsArtistsFromDb()
+        public void GetArtistsForUser_GetsArtistsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -39,7 +39,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetArtists(user.Id);
+            var result = artistHelper.GetArtistsForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -75,7 +75,7 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        public void GetGenres_GetsGenresFromDb()
+        public void GetGenresForUser_GetsGenresFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -98,7 +98,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetGenres(user.Id);
+            var result = artistHelper.GetGenresForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -108,7 +108,7 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        public void GetSongs_GetsSongsFromDb()
+        public void GetSongsForUser_GetsSongsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -129,7 +129,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetSongs(user.Id);
+            var result = artistHelper.GetSongsForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);

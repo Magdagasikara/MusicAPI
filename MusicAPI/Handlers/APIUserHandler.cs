@@ -23,11 +23,11 @@ namespace MusicAPI.Handlers
             
 
         }
-        public static IResult GetUser(int userId, IUserRepository userRepo)
+        public static IResult GetUser(string username, IUserRepository userRepo)
         {
             try
             {
-                var user = userRepo.GetUser(userId);
+                var user = userRepo.GetUser(username);
                 return Results.Json(user);
             }
             catch(UserNotFoundException ex)
@@ -56,11 +56,11 @@ namespace MusicAPI.Handlers
             return Results.StatusCode((int)HttpStatusCode.Created);
 
         }
-        public static IResult ConnectSongToUser(int userId, int songId, IUserRepository userRepo)
+        public static IResult ConnectSongToUser(string username, int songId, IUserRepository userRepo)
         {
             try
             {
-                userRepo.ConnectSongToUser(userId, songId);
+                userRepo.ConnectSongToUser(username, songId);
             }
             catch (UserNotFoundException ex)
             {
@@ -77,11 +77,11 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult ConnectArtistToUser(int userId, int artistId, IUserRepository userRepo)
+        public static IResult ConnectArtistToUser(string username, int artistId, IUserRepository userRepo)
         {
             try
             {
-                userRepo.ConnectArtistToUser(userId, artistId);
+                userRepo.ConnectArtistToUser(username, artistId);
             }
             catch (UserNotFoundException ex)
             {
@@ -98,11 +98,11 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult ConnectGenreToUser(int userId, int genreId, IUserRepository userHelper, IArtistRepository artistRepo)
+        public static IResult ConnectGenreToUser(string username, int genreId, IUserRepository userHelper, IArtistRepository artistRepo)
         {
             try
             {
-                userHelper.ConnectGenreToUser(userId, genreId);
+                userHelper.ConnectGenreToUser(username, genreId);
             }
             catch (UserNotFoundException ex)
             {
