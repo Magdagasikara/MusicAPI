@@ -110,7 +110,7 @@ namespace MusicAPI.Repositories
             if (user is null)
                 throw new UserNotFoundException();
 
-            Artist? artist= _context.Artists
+            Models.Artist artist= _context.Artists
                 .SingleOrDefault(a => a.Id == artistId);
 
             if (artist is null)

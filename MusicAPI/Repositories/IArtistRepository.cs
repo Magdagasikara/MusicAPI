@@ -2,6 +2,7 @@
 using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
+using Artist = MusicAPI.Models.Artist;
 
 namespace MusicAPI.Repositories
 {
@@ -52,7 +53,9 @@ namespace MusicAPI.Repositories
 
         public void AddArtist(ArtistDto artistDto)
         {
-            Artist? newArtist = new Artist
+            //check if duplicate by name
+
+            Artist newArtist = new Artist
             {
                 Name = artistDto.Name,
                 Description = artistDto.Description

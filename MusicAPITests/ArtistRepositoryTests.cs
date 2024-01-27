@@ -9,6 +9,7 @@ using MusicAPI.Models.Dtos;
 using MusicAPI.Services;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Repositories;
+using MusicAPI.Models.Wrappers;
 
 namespace MusicAPITests
 {
