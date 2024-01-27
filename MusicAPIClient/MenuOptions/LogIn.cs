@@ -25,6 +25,9 @@ namespace MusicAPIClient.MenuOptions
 
                 if (input.ToUpper() == "Y" || input.ToUpper() == "YES" || input.ToUpper() == "J" || input.ToUpper() == "JA")
                 {
+                    // OBS-----
+                    // lyfta ut det till UserHandler som AddUser
+                    // --------
                     AddUser user = new AddUser()
                     {
                         Name = username
@@ -38,6 +41,9 @@ namespace MusicAPIClient.MenuOptions
                     {
                         await Console.Out.WriteLineAsync($"Failed to create user (status code {response.StatusCode})");
                     }
+                    // --------
+                    // lyfta ut det till UserHandler som AddUser
+                    // -----OBS
                 }
                 else
                 {
@@ -50,12 +56,12 @@ namespace MusicAPIClient.MenuOptions
 
             }
 
-
             // if admin: go to AdminMenu
             if (username.ToUpper() == "ADMIN")
             {
                 AdminMenu.AdminMenuOptions();
             }
+
             // if user: go to UserMenu 
             else
             {
@@ -65,7 +71,7 @@ namespace MusicAPIClient.MenuOptions
 
                 GetSingleUser user = JsonSerializer.Deserialize<GetSingleUser>(content);
 
-                UserMenu.UserMenuOptions(user.Id, username);
+                UserMenu.UserMenuOptions(client, user.Name);
             }
 
         }

@@ -25,7 +25,8 @@ namespace MusicAPI
             app.MapGet("/", () => "Hello klassen!");
 
             // GETS - artists/songs/genres
-            //ändra dessa 3 metoder så de bara returnerar artists utan userId?
+            //skapa dessa 3 metoder så de bara returnerar artists utan userId? 
+            //de som finns där hetter tidigare t.ex. GetArtists men är nu ändrade till GetArtistsForUser
             //app.MapGet("/artist/", APIArtistHandler.GetArtists);
             //app.MapGet("/genre/", APIArtistHandler.GetGenres);
             //app.MapGet("/song/", APIArtistHandler.GetSongs);
@@ -38,16 +39,16 @@ namespace MusicAPI
             // GETS - user
             app.MapGet("/user/", APIUserHandler.GetAllUsers);
             app.MapGet("/user/{username}", APIUserHandler.GetUser);
-            // skapa liknande 3 metoder i UserRepo som heter istället "GetArtistForUser" etc?
-            app.MapGet("/artist/", APIArtistHandler.GetArtists);
-            app.MapGet("/genre/", APIArtistHandler.GetGenres);
-            app.MapGet("/song/", APIArtistHandler.GetSongs);
+            // jag vill flytta dessa tre nedan från ArtistRepo till UserRepo 
+            app.MapGet("/user/{username}/artist/", APIArtistHandler.GetArtistsForUser);
+            app.MapGet("/user/{username}/genre/", APIArtistHandler.GetGenresForUser);
+            app.MapGet("/user/{username}/song/", APIArtistHandler.GetSongsForUser);
 
             // POSTS - user
             app.MapPost("/user/", APIUserHandler.AddUser);
-            app.MapPost("/user/{userId}/song/{songId}", APIUserHandler.ConnectSongToUser);
-            app.MapPost("/user/{userId}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
-            app.MapPost("/user/{userId}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
+            app.MapPost("/user/{username}/song/{songId}", APIUserHandler.ConnectSongToUser);
+            app.MapPost("/user/{username}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
+            app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
 
             app.Run();
         }

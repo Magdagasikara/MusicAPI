@@ -9,11 +9,11 @@ namespace MusicAPI.Repositories
     public interface IUserRepository
     {
         public List<User> GetAllUsers();
-        public User GetUser(string username);
+        public UsersViewModel GetUser(string username);
         public void AddUser(UserDto userDto);
-        public void ConnectSongToUser(int userId, int songId);
-        public void ConnectArtistToUser(int userId, int artistId);
-        public void ConnectGenreToUser(int userId, int genreId);
+        public void ConnectSongToUser(string username, int songId);
+        public void ConnectArtistToUser(string username, int artistId);
+        public void ConnectGenreToUser(string username, int genreId);
     }
 
     public class DbUserRepository : IUserRepository
@@ -34,11 +34,15 @@ namespace MusicAPI.Repositories
             return viewUsers;
         }
 
-        public User GetUser(string username)
+        public UsersViewModel GetUser(string username)
         {
-            var user = _context.Users
-                .Where(u => u.Name.ToUpper() == username.ToUpper())
-                .SingleOrDefault();
+           var user = _context.Users
+               .Where(u => u.Name.ToUpper() == username.ToUpper())
+               .Select(u => new UsersViewModel
+               {
+                   Name = u.Name,
+               })
+               .SingleOrDefault();
 
             if (user == null)
                 throw new UserNotFoundException();
@@ -69,11 +73,11 @@ namespace MusicAPI.Repositories
         }
 
 
-        public void ConnectSongToUser(int userId, int songId)
+        public void ConnectSongToUser(string username, int songId)
         {
             User? user = _context.Users
                 .Include(u => u.Songs)
-                .SingleOrDefault(u => u.Id == userId);
+                .SingleOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user is null)
                 throw new UserNotFoundException();
@@ -92,16 +96,16 @@ namespace MusicAPI.Repositories
             }
             catch
             {
-                throw new Exception($"Unable to connect userId {userId} with songId {songId}");
+                throw new Exception($"Unable to connect user {username} with songId {songId}");
             }
         }
 
-        public void ConnectArtistToUser(int userId, int artistId)
+        public void ConnectArtistToUser(string username, int artistId)
         {
 
             User? user = _context.Users
                 .Include(u => u.Artists)
-                .SingleOrDefault(u => u.Id == userId);
+                .SingleOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user is null)
                 throw new UserNotFoundException();
@@ -120,15 +124,15 @@ namespace MusicAPI.Repositories
             }
             catch
             {
-                throw new Exception($"Unable to connect userId {userId} with artistId {artistId}");
+                throw new Exception($"Unable to connect user {username} with artistId {artistId}");
             }
         }
 
-        public void ConnectGenreToUser(int userId, int genreId)
+        public void ConnectGenreToUser(string username, int genreId)
         {
             User? user = _context.Users
                 .Include(u => u.Genres)
-                .SingleOrDefault(u => u.Id == userId);
+                .SingleOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user == null)
                 throw new UserNotFoundException();
@@ -147,7 +151,7 @@ namespace MusicAPI.Repositories
 
             catch
             {
-                throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
+                throw new Exception($"Unable to connect user {username} with GenreId {genreId}");
             }
         }
 

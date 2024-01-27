@@ -44,41 +44,41 @@ namespace MusicAPI.Handlers
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
-        public static IResult GetArtists(int userId, IArtistRepository artistRepo)
+        public static IResult GetArtistsForUser(string username, IArtistRepository artistRepo)
         {
             try
             {
-                artistRepo.GetArtists(userId);
+                artistRepo.GetArtistsForUser(username);
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to get artists {ex.Message}");
+                return Results.BadRequest(new {Message =$"Unable to get artists {ex.Message}" });
             }
-            return Results.Json(artistRepo.GetArtists(userId));
+            return Results.Json(artistRepo.GetArtistsForUser(username));
         }
-        public static IResult GetGenres(int userId, IArtistRepository artistRepo)
+        public static IResult GetGenresForUser(string username, IArtistRepository artistRepo)
         {
             try
             {
-                artistRepo.GetGenres(userId);
+                artistRepo.GetGenresForUser(username);
             }
             catch (Exception ex)
             {
                 return Results.BadRequest($"Unable to get genres {ex.Message}");
             }
-            return Results.Json(artistRepo.GetGenres(userId));
+            return Results.Json(artistRepo.GetGenresForUser(username));
         }
-        public static IResult GetSongs(int userId, IArtistRepository artistRepo)
+        public static IResult GetSongsForUser(string username, IArtistRepository artistRepo)
         {
             try
             {
-                artistRepo.GetSongs(userId);
+                artistRepo.GetSongsForUser(username);
             }
             catch (Exception ex)
             {
                 return Results.BadRequest($"Unable to get songs {ex.Message}");
             }
-            return Results.Json(artistRepo.GetSongs(userId));
+            return Results.Json(artistRepo.GetSongsForUser(username));
 
         }
     }

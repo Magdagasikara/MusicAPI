@@ -1,7 +1,9 @@
-﻿using MusicAPIClient.APIModels;
+﻿using Microsoft.Extensions.Hosting;
+using MusicAPIClient.APIModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -11,27 +13,25 @@ namespace MusicAPIClient.Handlers
     // Magda
     public class UserHandler
     {
-        public static async Task GetUser(HttpClient client, string name)
+        public static async Task GetArtistsForUser(HttpClient client, string username)
         {
-            HttpResponseMessage response = await client.GetAsync("/user/{id}");
-
-            Console.Write("Enter id to view specific user");
-            string input = Console.ReadLine();
-
-            int id;
-
-            if(int.TryParse(input, out id))
+            HttpResponseMessage response = await client.GetAsync($"/user/{username}/artist/");
+            await Console.Out.WriteLineAsync($"{response.StatusCode}");
+            if (response.StatusCode == HttpStatusCode.BadRequest)
             {
-                try
-                {
-                    //var response = await client.GetAsync($"/blog/{id}");
-                }
-
-                catch
-                {
-
-                }
+                await Console.Out.WriteLineAsync("No saved artists yet. Press any key to return to menu.");
+                Console.ReadKey();
+                return;
             }
+            else if (!response.IsSuccessStatusCode)
+            {
+                await Console.Out.WriteLineAsync($"{response.StatusCode}");
+                Console.ReadKey();
+                throw new Exception($"Failed to get your saved artists. Status code: {response.StatusCode}");
+            }
+            else { await Console.Out.WriteLineAsync("wohoo"); }
+            
+
         }
     }
 }
