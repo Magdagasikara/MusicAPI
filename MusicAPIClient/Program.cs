@@ -5,6 +5,8 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using MusicAPIClient.MenuOptions;
+using System.Text;
 
 namespace MusicAPIClient
 {
@@ -18,22 +20,13 @@ namespace MusicAPIClient
             // => redirects to UserMenu()
             using (HttpClient client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://localhost:7181/");
 
-                var loggedInUser = LogInUser(userHelper);
+                client.BaseAddress = new Uri("https://localhost:7181");
+                await LogIn.LogInUser(client);
+
             }
         }
 
-        static User LogInUser(UserHelper userHelper)
-        {
-            Console.Write("Username: ");
-            string username = Console.ReadLine();
-            Console.Write("Password: ");
-            string password = Console.ReadLine();
-
-            // Logic to check if user already exists
-            // return loggedInUser;
-        }
     }
 }
 

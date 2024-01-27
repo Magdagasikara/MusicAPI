@@ -24,7 +24,7 @@ namespace MusicAPIClient.Handlers
             {
                 try
                 {
-                    var response = await client.GetAsync($"/blog/{id}");
+                    //var response = await client.GetAsync($"/blog/{id}");
                 }
 
                 catch

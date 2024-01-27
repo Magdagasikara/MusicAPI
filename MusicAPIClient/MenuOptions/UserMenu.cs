@@ -11,62 +11,63 @@ namespace MusicAPIClient.MenuOptions
     public class UserMenu
     {
 
-        public static async Task UserMenuOptions()
+        public static async Task UserMenuOptions(int userId, string username)
         {
             while (true)
             {
 
+                DisplayUserMenu(username);
                 string userResponse = Console.ReadLine();
 
-                DisplayUserMenu();
 
                 switch (userResponse)
                 {
 
                     case "1":
-                        await UserHandler.GetSongs(loggedInUser);
+                        //await UserHandler.GetSongs(userId);
                         break;
 
                     case "2":
-                        await UserHandler.GetArtists(loggedInUser);
+                        //await UserHandler.GetArtists(userId);
                         break;
 
                     case "3":
-                        await UserHandler.GetGenres(loggedInUser);
+                        //await UserHandler.GetGenres(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddSong
                     case "4":
-                        await UserHandler.ConnectSongToUser(loggedInUser);
+                        //await UserHandler.ConnectSongToUser(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddGenre
                     case "5":
-                        await UserHandler.ConnectGenreToUser(loggedInUser);
+                        //await UserHandler.ConnectGenreToUser(userId);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddArtist
                     case "6":
-                        await UserHandler.ConnectArtistToUser(loggedInUser);
+                        //await UserHandler.ConnectArtistToUser(userId);
                         break;
 
-                    case "7":
+                    case "13":
                         return;
 
                     default:
-                        await Console.Out.WriteLineAsync("Invalid input, try again.");
+                        //await Console.Out.WriteLineAsync("Invalid input, try again.");
                         break;
 
                 }
             }
         }
 
-        static void DisplayUserMenu()
+        static void DisplayUserMenu(string username)
         {
-            Console.WriteLine("Welcome to Music API! Please enter:");
+            Console.Clear();
+            Console.WriteLine($"Welcome to Music API, {username}! Please enter:");
             Console.WriteLine("-----------------------------------_");
             Console.WriteLine("1. To view all users");
             Console.WriteLine("2. To view specific user");

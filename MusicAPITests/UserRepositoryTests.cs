@@ -55,12 +55,12 @@ namespace MusicAPITests
             ApplicationContext context = new ApplicationContext(dbContextOptions);
             DbUserRepository userHelper = new DbUserRepository(context);
 
-            var testUser = new User { Id = 1, Name = "TestUser" };
+            var testUser = new User { Name = "TestUser" };
             context.Users.Add(testUser);
             context.SaveChanges();
 
             // Act
-            var user = userHelper.GetUser(testUser.Id);
+            var user = userHelper.GetUser(testUser.Name);
 
             // Assert
             Assert.AreEqual("TestUser", user.Name);

@@ -9,7 +9,7 @@ namespace MusicAPI.Repositories
     public interface IUserRepository
     {
         public List<User> GetAllUsers();
-        public UsersViewModel GetUser(int userId);
+        public User GetUser(string username);
         public void AddUser(UserDto userDto);
         public void ConnectSongToUser(int userId, int songId);
         public void ConnectArtistToUser(int userId, int artistId);
@@ -34,15 +34,11 @@ namespace MusicAPI.Repositories
             return viewUsers;
         }
 
-        public UsersViewModel GetUser(int userId)
+        public User GetUser(string username)
         {
             var user = _context.Users
-                .Where(u => u.Id == userId)
-                .Select(u => new UsersViewModel
-                {
-                    Name = u.Name,
-                })
-                .FirstOrDefault();
+                .Where(u => u.Name.ToUpper() == username.ToUpper())
+                .SingleOrDefault();
 
             if (user == null)
                 throw new UserNotFoundException();
@@ -51,9 +47,9 @@ namespace MusicAPI.Repositories
         }
         public void AddUser(UserDto user)
         {
-            
-            if (_context.Users.Any(u => u.Name == user.Name))
-                throw new Exception($"User with name {user.Name} already exists in the database");
+
+            if (_context.Users.Any(u => u.Name.ToUpper() == user.Name.ToUpper()))
+                throw new Exception($"User with name {user.Name} already exists in the database.");
 
             _context.Users
                 .Add(new User()
@@ -78,13 +74,13 @@ namespace MusicAPI.Repositories
             User? user = _context.Users
                 .Include(u => u.Songs)
                 .SingleOrDefault(u => u.Id == userId);
-            
-            if (user is null) 
+
+            if (user is null)
                 throw new UserNotFoundException();
 
             Song? song = _context.Songs
                 .SingleOrDefault(s => s.Id == songId);
-            
+
             if (song is null)
                 throw new SongNotFoundException();
 
@@ -110,7 +106,7 @@ namespace MusicAPI.Repositories
             if (user is null)
                 throw new UserNotFoundException();
 
-            Artist? artist= _context.Artists
+            Artist? artist = _context.Artists
                 .SingleOrDefault(a => a.Id == artistId);
 
             if (artist is null)
@@ -149,7 +145,7 @@ namespace MusicAPI.Repositories
                 _context.SaveChanges();
             }
 
-            catch 
+            catch
             {
                 throw new Exception($"Unable to connect UserId:{userId} with GenreId{genreId}");
             }

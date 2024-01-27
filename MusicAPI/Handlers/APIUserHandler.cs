@@ -23,11 +23,11 @@ namespace MusicAPI.Handlers
             
 
         }
-        public static IResult GetUser(int userId, IUserRepository userRepo)
+        public static IResult GetUser(string username, IUserRepository userRepo)
         {
             try
             {
-                var user = userRepo.GetUser(userId);
+                var user = userRepo.GetUser(username);
                 return Results.Json(user);
             }
             catch(UserNotFoundException ex)
