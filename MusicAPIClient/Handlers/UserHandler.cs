@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using ConsoleTables;
+using Microsoft.Extensions.Hosting;
 using MusicAPIClient.APIModels;
 using System;
 using System.Collections.Generic;
@@ -15,8 +16,12 @@ namespace MusicAPIClient.Handlers
     {
         public static async Task GetArtistsForUser(HttpClient client, string username)
         {
+
+            // OBS lägg till omredigering från BadRequest
+            // "vill du lägga till artister nu?" och skicka till den metoden
+
             HttpResponseMessage response = await client.GetAsync($"/user/{username}/artist/");
-            await Console.Out.WriteLineAsync($"{response.StatusCode}");
+            
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 await Console.Out.WriteLineAsync("No saved artists yet. Press any key to return to menu.");
@@ -35,16 +40,23 @@ namespace MusicAPIClient.Handlers
 
                 ListArtist[] artists = JsonSerializer.Deserialize<ListArtist[]>(content);
 
+                var table = new ConsoleTable("ARTIST NAME", "DESCRIPTION");
+
                 foreach (var artist in artists)
                 {
-                    await Console.Out.WriteLineAsync($"{artist.Name}:\t{artist.Description}");
-                   
+                    table.AddRow(artist.Name, artist.Description);
                 }
+                table.Write(); 
                 Console.ReadKey();
 
             }
             
 
+        }
+
+        public static Task GetSongsForUser(HttpClient client, string username)
+        {
+            throw new NotImplementedException();
         }
     }
 }

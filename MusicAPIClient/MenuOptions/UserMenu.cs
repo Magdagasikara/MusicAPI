@@ -29,11 +29,11 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "2":
-                        //await UserHandler.GetSongs(userId);
+                        await UserHandler.GetSongsForUser(client, username);
                         break;
 
                     case "3":
-                        //await UserHandler.GetGenres(userId);
+                        //await UserHandler.GetGenresForUser(client, username);
                         break;
 
                     // User
