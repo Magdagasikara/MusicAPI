@@ -10,13 +10,13 @@ namespace MusicAPIClient.MenuOptions
 {
     public class AdminMenu
     {
-        public static async Task AdminMenuOptions()
+        public static async Task AdminMenuOptions(HttpClient client, string username)
         {
 
             while (true)
             {
+                await DisplayAdminMenu(username);
                 string userResponse = Console.ReadLine();
-                DisplayAdminMenu();
 
                 switch (userResponse)
                 {
@@ -26,49 +26,42 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "2":
-                        await UserHandler.AddUser(loggedInUser);
+                        await AdminHandler.AddUser(client);
                         break;
 
                     case "3":
-                        await AdminHandler.AddSong(loggedInUser);
+                        await AdminHandler.AddSong(client);
                         break;
 
                     case "4":
-                        await AdminHandler.AddGenre(loggedInUser);
+                        await AdminHandler.AddGenre(client);
                         break;
 
                     case "5":
-                        await AdminHandler.AddArtist(loggedInUser);
+                        await AdminHandler.AddArtist(client);
                         break;
 
-                    case "6":
+                    case "X":
+                    case "x":
                         return;
 
                     default:
                         await Console.Out.WriteLineAsync("Invalid input, try again.");
                         break;
-
                 }
             }
         }
 
-        static void DisplayAdminMenu()
+        static async Task DisplayAdminMenu(string username)
         {
-            Console.WriteLine("Welcome to Music API! Please enter:");
-            Console.WriteLine("-----------------------------------_");
+            Console.WriteLine($"Welcome to Music API {username}! Please enter:");
+            Console.WriteLine("----------------------------------------------");
             Console.WriteLine("1. To view all users");
-            Console.WriteLine("2. To view specific user");
-            Console.WriteLine("3. To add user");
-            Console.WriteLine("4. To add song");
-            Console.WriteLine("5. To add genre");
-            Console.WriteLine("6. To add artist");
-            Console.WriteLine("7. To add song to user");
-            Console.WriteLine("8. To add genre to user");
-            Console.WriteLine("9. To add artist to user");
-            Console.WriteLine("10. To view all user's songs");
-            Console.WriteLine("11. To view all user's artists");
-            Console.WriteLine("12. To view all user's genres");
-            Console.WriteLine("13. To exit.");
+            Console.WriteLine("2. To add new user");
+            Console.WriteLine("3. To add new song");
+            Console.WriteLine("4. To add new genre");
+            Console.WriteLine("5. To add new artist");
+            Console.WriteLine("X. To exit");
         }
     }
 }

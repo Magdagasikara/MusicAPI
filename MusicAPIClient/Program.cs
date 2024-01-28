@@ -18,10 +18,8 @@ namespace MusicAPIClient
             {
                 client.BaseAddress = new Uri("https://localhost:7181");
                 await LogIn.LogInUser(client);
-
             }
         }
-
     }
 }
 
