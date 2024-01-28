@@ -9,8 +9,6 @@ namespace MusicAPIClient.APIModels
 {
     internal class ListUsers
     {
-        [JsonPropertyName("id")]
-        public int Id { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; }
     }
