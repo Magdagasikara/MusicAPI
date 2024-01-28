@@ -11,5 +11,9 @@ namespace MusicAPIClient.APIModels
     {
         [JsonPropertyName("name")]
         public string Name { get; set; }
+        [JsonPropertyName("artist")]
+        public string Artist { get; set; }
+        [JsonPropertyName("genre")]
+        public string Genre { get; set; }
     }
 }

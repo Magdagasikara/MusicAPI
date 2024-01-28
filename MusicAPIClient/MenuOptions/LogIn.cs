@@ -69,9 +69,9 @@ namespace MusicAPIClient.MenuOptions
 
                 string content = await response.Content.ReadAsStringAsync();
 
-                GetSingleUser user = JsonSerializer.Deserialize<GetSingleUser>(content);
+                ListUsers user = JsonSerializer.Deserialize<ListUsers>(content);
 
-                UserMenu.UserMenuOptions(client, user.Name);
+                await UserMenu.UserMenuOptions(client, user.Name);
             }
         }
     }

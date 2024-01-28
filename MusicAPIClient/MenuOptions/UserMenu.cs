@@ -3,6 +3,7 @@ using MusicAPIClient.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace MusicAPIClient.MenuOptions
             while (true)
             {
 
-                DisplayUserMenu(username);
+                await DisplayUserMenu(username);
                 string userResponse = Console.ReadLine();
 
 
@@ -28,11 +29,11 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "2":
-                        //await UserHandler.GetSongs(userId);
+                        await UserHandler.GetSongsForUser(client, username);
                         break;
 
                     case "3":
-                        //await UserHandler.GetGenres(userId);
+                        await UserHandler.GetGenresForUser(client, username);
                         break;
 
                     // User
@@ -41,10 +42,8 @@ namespace MusicAPIClient.MenuOptions
                         //await UserHandler.ConnectArtistToUser(userId);
                         break;
 
-                    // User
-                    // Disclaimer: if song does not exist => redirect to AddGenre
                     case "5":
-                        //await UserHandler.ConnectSongToUser(userId);
+                        await UserHandler.ConnectSongToUser(client, username);
                         break;
 
                     // User
@@ -58,14 +57,14 @@ namespace MusicAPIClient.MenuOptions
                         return;
 
                     default:
-                        //await Console.Out.WriteLineAsync("Invalid input, try again.");
+                        await Console.Out.WriteAsync("Invalid input, try again.");
                         break;
 
                 }
             }
         }
 
-        static void DisplayUserMenu(string username)
+        static async Task DisplayUserMenu(string username)
         {
             Console.Clear();
             Console.WriteLine($"Welcome to Music API, {username}! Please enter:");

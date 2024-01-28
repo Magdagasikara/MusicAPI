@@ -34,7 +34,7 @@ namespace MusicAPI
             // POSTS - artists/songs/genres
             app.MapPost("/artist/", APIArtistHandler.AddArtist);
             app.MapPost("/genre/", APIArtistHandler.AddGenre);
-            app.MapPost("/song/", APIArtistHandler.AddSong);
+            app.MapPost("/song/{artistId}/{genreId}", APIArtistHandler.AddSong);
 
             // GETS - user
             app.MapGet("/user/", APIUserHandler.GetAllUsers);
