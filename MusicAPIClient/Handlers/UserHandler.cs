@@ -29,7 +29,20 @@ namespace MusicAPIClient.Handlers
                 Console.ReadKey();
                 throw new Exception($"Failed to get your saved artists. Status code: {response.StatusCode}");
             }
-            else { await Console.Out.WriteLineAsync("wohoo"); }
+            else {
+
+                string content = await response.Content.ReadAsStringAsync();
+
+                ListArtist[] artists = JsonSerializer.Deserialize<ListArtist[]>(content);
+
+                foreach (var artist in artists)
+                {
+                    await Console.Out.WriteLineAsync($"{artist.Name}:\t{artist.Description}");
+                   
+                }
+                Console.ReadKey();
+
+            }
             
 
         }

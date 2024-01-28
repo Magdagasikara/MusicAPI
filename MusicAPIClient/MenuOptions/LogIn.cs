@@ -59,7 +59,7 @@ namespace MusicAPIClient.MenuOptions
             // if admin: go to AdminMenu
             if (username.ToUpper() == "ADMIN")
             {
-                AdminMenu.AdminMenuOptions();
+                await AdminMenu.AdminMenuOptions();
             }
 
             // if user: go to UserMenu 
@@ -71,7 +71,7 @@ namespace MusicAPIClient.MenuOptions
 
                 GetSingleUser user = JsonSerializer.Deserialize<GetSingleUser>(content);
 
-                UserMenu.UserMenuOptions(client, user.Name);
+                await UserMenu.UserMenuOptions(client, user.Name);
             }
 
         }

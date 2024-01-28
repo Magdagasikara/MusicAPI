@@ -3,6 +3,7 @@ using MusicAPIClient.Handlers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace MusicAPIClient.MenuOptions
             while (true)
             {
 
-                DisplayUserMenu(username);
+                await DisplayUserMenu(username);
                 string userResponse = Console.ReadLine();
 
 
@@ -65,7 +66,7 @@ namespace MusicAPIClient.MenuOptions
             }
         }
 
-        static void DisplayUserMenu(string username)
+        static async Task DisplayUserMenu(string username)
         {
             Console.Clear();
             Console.WriteLine($"Welcome to Music API, {username}! Please enter:");
