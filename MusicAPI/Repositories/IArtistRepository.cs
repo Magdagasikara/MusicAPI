@@ -14,6 +14,9 @@ namespace MusicAPI.Repositories
         public List<ArtistsViewModel> GetArtistsForUser(string username);
         public List<GenresViewModel> GetGenresForUser(string username);
         public List<SongsViewModel> GetSongsForUser(string username);
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber);
+        public List<GenresViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber);
+        public List<SongsViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber);
     }
 
     public class DbArtistRepository : IArtistRepository
@@ -185,10 +188,115 @@ namespace MusicAPI.Repositories
                     Genre = s.Genre.Title,
                 })
                 .ToList();
-                
+
 
             return songs;
 
         }
+
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber)
+        {
+
+            List<ArtistsWithIdViewModel> artists = _context.Artists
+                .Select(a => new ArtistsWithIdViewModel
+                {
+                    Id = a.Id,
+                    Name = a.Name,
+                    Description = a.Description
+                })
+                .OrderBy(a => a.Name)
+                .ToList();
+
+
+            if (artists == null || artists.Count == 0)
+            {
+                throw new Exception($"There are no available artists");
+            }
+
+            // Show all artists
+            if (name is null && amountPerPage is null && pageNumber is null)
+            {
+                return artists;
+            }
+
+            // Show a filtered list       
+            if (name is not null)
+            {
+                artists = artists
+                        .Where(a => a.Name.ToUpper().StartsWith(name.ToUpper()))
+                        .ToList();
+            }
+
+            // Pagination
+            // check if amountPerPage & pageNumber are integers, otherwise return bad request
+            if (amountPerPage is not null || pageNumber is not null)
+            {
+                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
+                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                {
+                    throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
+                }
+                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
+                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                {
+                    throw new Exception($"{nameof(pageNumber)} måste vara en integer");
+                }
+
+                int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
+                int numberOfPages = (int)Math.Ceiling((decimal)artists.Count / parsedAmountPerPage);
+                int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : artists.Count % parsedAmountPerPage;
+
+                artists = artists
+                 .Skip(skipAmount)
+                 .Take(amountOnThisPage)
+                 .ToList();
+
+            }
+
+            return artists;
+
+        }
+
+        public List<GenresViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber)
+        {
+            List<GenresViewModel> genres = _context.Genres
+                .Select(g => new GenresViewModel
+                {
+                    Title = g.Title,
+                })
+                .OrderBy(g => g.Title)
+                .ToList();
+
+            if (genres == null || genres.Count == 0)
+            {
+                throw new Exception($"There are no available genres");
+            }
+
+            return genres;
+        }
+
+        public List<SongsViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber)
+        {
+            var songs = _context.Songs
+                            .Include(s => s.Artist)
+                            .Include(s => s.Genre)
+                            .Select(s => new SongsViewModel
+                            {
+                                Name = s.Name,
+                                Artist = s.Artist.Name,
+                                Genre = s.Genre.Title,
+                            })
+                            .OrderBy(s => s.Name)
+                            .ToList();
+
+            if (songs == null || songs.Count() == 0)
+            {
+                throw new Exception($"There are no available songs");
+            }
+
+            return songs;
+
+        }
+
     }
 }

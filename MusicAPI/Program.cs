@@ -25,11 +25,9 @@ namespace MusicAPI
             app.MapGet("/", () => "Hello klassen!");
 
             // GETS - artists/songs/genres
-            //skapa dessa 3 metoder så de bara returnerar artists utan userId? 
-            //de som finns där hetter tidigare t.ex. GetArtists men är nu ändrade till GetArtistsForUser
-            //app.MapGet("/artist/", APIArtistHandler.GetArtists);
-            //app.MapGet("/genre/", APIArtistHandler.GetGenres);
-            //app.MapGet("/song/", APIArtistHandler.GetSongs);
+            app.MapGet("/artist/", APIArtistHandler.GetArtists);
+            app.MapGet("/genre/", APIArtistHandler.GetGenres);
+            app.MapGet("/song/", APIArtistHandler.GetSongs);
 
             // POSTS - artists/songs/genres
             app.MapPost("/artist/", APIArtistHandler.AddArtist);
@@ -39,7 +37,6 @@ namespace MusicAPI
             // GETS - user
             app.MapGet("/user/", APIUserHandler.GetAllUsers);
             app.MapGet("/user/{username}", APIUserHandler.GetUser);
-            // jag vill flytta dessa tre nedan från ArtistRepo till UserRepo 
             app.MapGet("/user/{username}/artist/", APIArtistHandler.GetArtistsForUser);
             app.MapGet("/user/{username}/genre/", APIArtistHandler.GetGenresForUser);
             app.MapGet("/user/{username}/song/", APIArtistHandler.GetSongsForUser);
