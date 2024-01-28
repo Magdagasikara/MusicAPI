@@ -39,7 +39,7 @@ namespace MusicAPI.Repositories
                 };
 
                 _context.Genres.Add(newGenre);
-                
+
                 try
                 {
                     _context.SaveChanges();
@@ -98,7 +98,7 @@ namespace MusicAPI.Repositories
             }
 
             var user = _context.Users.Include(u => u.Artists)
-                .SingleOrDefault(u => u.Name.ToUpper()  == username.ToUpper());
+                .SingleOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user == null)
             {
@@ -166,6 +166,9 @@ namespace MusicAPI.Repositories
         {
             var user = _context.Users
                 .Include(u => u.Songs)
+                    .ThenInclude(s => s.Artist)
+                .Include(u => u.Songs)
+                    .ThenInclude(s => s.Genre)
                 .SingleOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user == null)
@@ -173,20 +176,19 @@ namespace MusicAPI.Repositories
                 throw new Exception($"No user {username}");
             }
 
-            List<Song>? userSongs = _context.Users
-                .Where(u => u.Name == username)
-                .SelectMany(u => u.Songs)
-                .ToList();
-
-            List<SongsViewModel> songs = userSongs
+            List<SongsViewModel> songs = user
+                .Songs
                 .Select(s => new SongsViewModel
                 {
-                    Name = s.Name
-                }).ToList();
+                    Name = s.Name,
+                    Artist = s.Artist.Name,
+                    Genre = s.Genre.Title,
+                })
+                .ToList();
+                
 
             return songs;
 
-            throw new NotImplementedException();
         }
     }
 }

@@ -33,7 +33,7 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "3":
-                        //await UserHandler.GetGenresForUser(client, username);
+                        await UserHandler.GetGenresForUser(client, username);
                         break;
 
                     // User
@@ -42,10 +42,8 @@ namespace MusicAPIClient.MenuOptions
                         //await UserHandler.ConnectArtistToUser(userId);
                         break;
 
-                    // User
-                    // Disclaimer: if song does not exist => redirect to AddGenre
                     case "5":
-                        //await UserHandler.ConnectSongToUser(userId);
+                        await UserHandler.ConnectSongToUser(client, username);
                         break;
 
                     // User
@@ -59,7 +57,7 @@ namespace MusicAPIClient.MenuOptions
                         return;
 
                     default:
-                        //await Console.Out.WriteLineAsync("Invalid input, try again.");
+                        await Console.Out.WriteAsync("Invalid input, try again.");
                         break;
 
                 }
