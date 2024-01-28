@@ -69,9 +69,7 @@ namespace MusicAPI.Repositories
             {
                 throw new Exception("Unable to save user to database");
             }
-
         }
-
 
         public void ConnectSongToUser(string username, int songId)
         {
@@ -148,12 +146,10 @@ namespace MusicAPI.Repositories
                 user.Genres.Add(genre);
                 _context.SaveChanges();
             }
-
             catch
             {
                 throw new Exception($"Unable to connect user {username} with GenreId {genreId}");
             }
         }
-
     }
 }

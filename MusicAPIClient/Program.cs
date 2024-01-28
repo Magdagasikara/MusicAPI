@@ -20,13 +20,10 @@ namespace MusicAPIClient
             // => redirects to UserMenu()
             using (HttpClient client = new HttpClient())
             {
-
                 client.BaseAddress = new Uri("https://localhost:7181");
                 await LogIn.LogInUser(client);
-
             }
         }
-
     }
 }
 
