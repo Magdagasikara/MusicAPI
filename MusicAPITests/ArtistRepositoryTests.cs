@@ -16,7 +16,7 @@ namespace MusicAPITests
     public class ArtistRepositoryTests
     {
         [TestMethod]
-        public void GetArtists_GetsArtistsFromDb()
+        public void GetArtistsForUser_GetsArtistsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -39,7 +39,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetArtists(user.Id);
+            var result = artistHelper.GetArtistsForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -68,14 +68,14 @@ namespace MusicAPITests
 
             // Act
             artistHelper.AddSong(new SongDto() { Name = "TestSong" }, artist.Id, genre.Id);
-            
+
             // Assert
             Assert.AreEqual(1, context.Songs.Count());
             Assert.AreEqual("TestSong", context.Songs.SingleOrDefault().Name);
         }
 
         [TestMethod]
-        public void GetGenres_GetsGenresFromDb()
+        public void GetGenresForUser_GetsGenresFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -98,7 +98,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetGenres(user.Id);
+            var result = artistHelper.GetGenresForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -108,7 +108,7 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        public void GetSongs_GetsSongsFromDb()
+        public void GetSongsForUser_GetsSongsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
@@ -118,18 +118,19 @@ namespace MusicAPITests
             DbArtistRepository artistHelper = new DbArtistRepository(context);
 
             User user = new User() { Name = "Test_User", Songs = new List<Song>() };
-            Song song1 = new Song() { Name = "Test_Song1" };
-            Song song2 = new Song() { Name = "Test_Song2" };
+            Artist artist = new Artist() { Name = "Test_Artist", Description = "Test_ArtistDescription" };
+            Genre genre = new Genre() { Title = "Test_Genre" };
+            Song song1 = new Song() { Name = "Test_Song1", Artist = artist, Genre = genre };
+            Song song2 = new Song() { Name = "Test_Song2", Artist = artist, Genre = genre };
 
             context.Users.Add(user);
             user.Songs.Add(song1);
             user.Songs.Add(song2);
 
-
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetSongs(user.Id);
+            var result = artistHelper.GetSongsForUser(user.Name);
 
             // Assert
             Assert.IsNotNull(result);
@@ -148,7 +149,7 @@ namespace MusicAPITests
             ApplicationContext context = new ApplicationContext(options);
             DbArtistRepository artistHelper = new DbArtistRepository(context);
 
-            GenreDto genre = new GenreDto() { Title = "Test_Genre"};
+            GenreDto genre = new GenreDto() { Title = "Test_Genre" };
 
             // Act
             artistHelper.AddGenre(genre);
