@@ -2,6 +2,7 @@
 using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicAPI.Repositories
 {
@@ -13,7 +14,8 @@ namespace MusicAPI.Repositories
         public List<ArtistsViewModel> GetArtists(int userId);
         public List<GenresViewModel> GetGenres(int userId);
         public List<SongsViewModel> GetSongs(int userId);
-    }
+        public Task AddArtistsGenresAndTracksFromSpotify(ArtistDto artistDto, GenreDto genreDto, List<SongDto> songDtos);
+    };
 
     public class DbArtistRepository : IArtistRepository
     {
@@ -86,7 +88,15 @@ namespace MusicAPI.Repositories
             };
 
             _context.Songs.Add(newSong);
-            _context.SaveChanges();
+
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch
+            {
+                throw new Exception("Unable to save Genre to database");
+            }
         }
 
         public List<ArtistsViewModel> GetArtists(int userId)
@@ -181,6 +191,100 @@ namespace MusicAPI.Repositories
             return songs;
 
             throw new NotImplementedException();
+        }
+
+        public async Task AddArtistsGenresAndTracksFromSpotify(ArtistDto artistDto, GenreDto genreDto, List<SongDto> songDtos)
+        {
+            var genreInDb = await _context.Genres.FirstOrDefaultAsync(g => g.Title == genreDto.Title);
+            var artistInDb = await _context.Artists.FirstOrDefaultAsync(a => a.Name == artistDto.Name);
+            
+            if (artistInDb == null)
+            {
+                Artist artist = new Artist()
+                {
+                    Name = artistDto.Name,
+                    Description = ""
+                };
+
+                if (genreInDb == null)
+                {
+                    Genre genre = new Genre()
+                    {
+                        Title = genreDto.Title
+                    };
+
+                    foreach (var songDto in songDtos)
+                    {
+                        Song song = new Song
+                        {
+                            Name = songDto.Name,
+                            Artist = artist,
+                            Genre = genre
+                        };
+
+                        _context.Add(song);
+                    }
+                }
+                else
+                {
+                    foreach (var songDto in songDtos)
+                    {
+                        Song song = new Song
+                        {
+                            Name = songDto.Name,
+                            Artist = artist,
+                            Genre = genreInDb
+                        };
+
+                        _context.Add(song);
+                    }
+                }
+            }
+            else
+            {
+                if (genreInDb == null)
+                {
+                    Genre genre = new Genre()
+                    {
+                        Title = genreDto.Title
+                    };
+
+                    foreach (var songDto in songDtos)
+                    {
+                        Song song = new Song
+                        {
+                            Name = songDto.Name,
+                            Artist = artistInDb,
+                            Genre = genre
+                        };
+
+                        _context.Add(song);
+                    }
+                }
+                else
+                {
+                    foreach (var songDto in songDtos)
+                    {
+                        Song song = new Song
+                        {
+                            Name = songDto.Name,
+                            Artist = artistInDb,
+                            Genre = genreInDb
+                        };
+
+                        _context.Add(song);
+                    }
+                }
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch
+            {
+                throw new Exception("Unable to save songs to database");
+            }
         }
     }
 }

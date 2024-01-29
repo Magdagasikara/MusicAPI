@@ -1,6 +1,9 @@
-﻿using MusicAPI.Data;
+﻿using Microsoft.Extensions.Configuration;
+using MusicAPI.Data;
 using MusicAPI.Models;
 using MusicAPI.Models.Dtos;
+using MusicAPI.Repositories;
+using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -8,67 +11,76 @@ namespace MusicAPI.Services
 {
     public interface ISpotifyHelper
     {
-        Task<SpotifyTrackArtistGenreDto> GetArtistGenreAndTrack(string accessToken, string searchQuery);
+        Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
     }
 
     public class SpotifyHelper : ISpotifyHelper
     {
         private readonly HttpClient _httpClient;
-        private readonly ApplicationContext _context;
+        private readonly ISpotifyAccountHelper _spotifyAccountHelper;
+        private readonly IConfiguration _configuration;
+        private readonly IArtistRepository _artistRepository;
 
-        public SpotifyHelper(HttpClient httpClient, ApplicationContext context)
+        public SpotifyHelper(HttpClient httpClient, ISpotifyAccountHelper spotifyAccountHelper, IConfiguration configuration, IArtistRepository artistRepository)
         {
             _httpClient = httpClient;
-            _context = context;
+            _spotifyAccountHelper = spotifyAccountHelper;
+            _configuration = configuration;
+            _artistRepository = artistRepository;
         }
 
-        public async Task SaveArtistGenreAndTrackToDatabase(string accessToken, string searchQuery)
+        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery)
         {
             if (string.IsNullOrWhiteSpace(searchQuery))
             {
                 return;
             }
 
-            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
-            var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={Uri.EscapeDataString(searchQuery)}&type=track,artist");
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
+            var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={Uri.EscapeDataString(searchQuery)}&type=track,artist&limit=50");
             response.EnsureSuccessStatusCode();
 
             using var responseStream = await response.Content.ReadAsStreamAsync();
             var responseObject = await JsonSerializer.DeserializeAsync<SpotifySearchResultDto>(responseStream);
 
-            if (responseObject.Tracks != null && responseObject.Artist != null)
+            if (responseObject.tracks != null && responseObject.artists != null)
             {
-                var artist = _context.Artists.FirstOrDefault(a => a.Name == responseObject.Artist.name);
+                List<SongDto> trackList = new List<SongDto>();
 
-                if (artist == null)
+                foreach (var spotifyTrack in responseObject.tracks.items)
                 {
-                    artist = new Artist
+                    if(spotifyTrack == null)
                     {
-                        Name = responseObject.Artist.name
+                        continue;
+                    }
+
+                    SongDto track = new SongDto()
+                    {
+                        Name = spotifyTrack.name
                     };
+
+                    trackList.Add(track);
                 }
 
-                var genre = _context.Genres.FirstOrDefault(g => g.Title == responseObject.Artist.genres[0]);
-
-                if (genre == null)
+                if(responseObject.artists.items.Length > 0)
                 {
-                    genre = new Genre
+                    var spotifyArtist = responseObject.artists.items[0];
+
+                    ArtistDto artist = new ArtistDto()
                     {
-                        Title = responseObject.Artist.genres[0]
+                        Name = spotifyArtist.name
                     };
+
+                    GenreDto genre = new GenreDto()
+                    {
+                        Title = spotifyArtist.genres[0]
+                    };
+
+                    await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, trackList);
                 }
-
-                var track = new Song
-                {
-                    Name = responseObject.Tracks.name,
-                    Artist = artist,
-                    Genre = genre
-                };
-
-                artist.Songs.Add(track);
-                await _context.SaveChangesAsync();
             }
         }
     }
