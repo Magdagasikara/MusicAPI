@@ -3,12 +3,13 @@ using MusicAPI.Data;
 using MusicAPI.Handlers;
 using MusicAPI.Repositories;
 using MusicAPI.Services;
+using Moq;
 
 namespace MusicAPI
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
@@ -19,10 +20,10 @@ namespace MusicAPI
             {
                 c.BaseAddress = new Uri("https://accounts.spotify.com/api/");
             });
-
+          
             var app = builder.Build();
 
-            app.MapGet("/", () => "Hello klassen!");
+            app.MapGet("/", () => "Välkommen till vår presentation klassen :)");
 
             // GETS - artists/songs/genres
             app.MapGet("/artist/", APIArtistHandler.GetArtists);
@@ -46,8 +47,32 @@ namespace MusicAPI
             app.MapPost("/user/{username}/song/{songId}", APIUserHandler.ConnectSongToUser);
             app.MapPost("/user/{username}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
             app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
+          
+                      var contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=MusicAPI;Integrated Security=True")
+                .Options;
 
-            app.Run();
+            var context = new ApplicationContext(contextOptions);
+
+            var httpClient = new HttpClient();
+            httpClient.BaseAddress = new Uri("https://accounts.spotify.com/api/");
+
+            ISpotifyAccountHelper spotifyAccountHelper = new SpotifyAccountHelper(httpClient);
+
+            IConfiguration configuration = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.Development.json")
+                .Build();
+
+            IArtistRepository artistRepository = new DbArtistRepository(context);
+
+            var spotifyHelper = new SpotifyHelper(httpClient, spotifyAccountHelper, configuration, artistRepository);
+
+            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb("Rihanna");
+
+            await Console.Out.WriteLineAsync("Successfully Added Tracks, Artist and Genre");
+            Console.ReadLine();
+          
+                      app.Run();
         }
     }
 }
