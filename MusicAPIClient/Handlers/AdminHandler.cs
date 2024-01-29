@@ -163,7 +163,7 @@ namespace MusicAPIClient.Handlers
             {
                 Name = name,
                 Description = description,
-                Genre = genre
+                //Genre = genre
             };
 
             string json = JsonSerializer.Serialize(addArtist);

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace MusicAPIClient.APIModels
 {
-    internal class AddArtist
+    public class ConnectUserToArtist
     {
-        [JsonPropertyName("name")]
-        public string Name { get; set; }
-        [JsonPropertyName("description")]
-        public string Description { get; set; }
+        [JsonPropertyName("username")]
+        public string Username { get; set; }
+        [JsonPropertyName("artistid")]
+        public int ArtistId { get; set; }
     }
 }

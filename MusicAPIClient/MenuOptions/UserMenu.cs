@@ -36,14 +36,12 @@ namespace MusicAPIClient.MenuOptions
                         await UserHandler.GetGenresForUser(client, username);
                         break;
 
-                    // User
-                    // Disclaimer: if song does not exist => redirect to AddSong
                     case "4":
-                        //await UserHandler.ConnectArtistToUser(userId);
+                        await UserHandler.ConnectArtistToUser(client, username);
                         break;
 
                     case "5":
-                        await UserHandler.ConnectSongToUser(client, username);
+                        //await UserHandler.ConnectSongToUser(client, username);
                         break;
 
                     // User
