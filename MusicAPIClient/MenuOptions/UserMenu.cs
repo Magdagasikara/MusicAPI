@@ -40,13 +40,13 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "5":
-                        //await UserHandler.ConnectSongToUser(client, username);
+                        await UserHandler.ConnectSongToUser(client, username);
                         break;
 
                     // User
                     // Disclaimer: if song does not exist => redirect to AddArtist
                     case "6":
-                        //await UserHandler.ConnectGenreToUser(userId);                        
+                        await UserHandler.ConnectGenreToUser(client, username);                        
                         break;
 
                     case "7":
@@ -69,7 +69,7 @@ namespace MusicAPIClient.MenuOptions
         {
             Console.Clear();
             Console.WriteLine($"Welcome to Music API, {username}! Please enter:");
-            Console.WriteLine("-----------------------------------_");
+            Console.WriteLine("-----------------------------------------------");
             Console.WriteLine("1. To view all artists you like");
             Console.WriteLine("2. To view all songs you like");
             Console.WriteLine("3. To view all genres you like");

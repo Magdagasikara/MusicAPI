@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 
 namespace MusicAPIClient.APIModels
 {
-    internal class ListGenres
+    internal class ListGenresWithId
     {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
         [JsonPropertyName("title")]
         public string Title { get; set; }
     }

@@ -1,6 +1,7 @@
 ﻿using ConsoleTables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using MusicAPI.Models.ViewModel;
 using MusicAPIClient.APIModels;
 using System;
 using System.Collections.Generic;
@@ -37,10 +38,9 @@ namespace MusicAPIClient.Handlers
             }
             else
             {
-
                 string content = await response.Content.ReadAsStringAsync();
 
-                ListArtist[] artists = JsonSerializer.Deserialize<ListArtist[]>(content);
+                ListArtistsWithId[] artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
 
                 var table = new ConsoleTable("ARTIST NAME", "DESCRIPTION");
 
@@ -72,10 +72,9 @@ namespace MusicAPIClient.Handlers
             }
             else
             {
-
                 string content = await response.Content.ReadAsStringAsync();
 
-                ListSongs[] songs = JsonSerializer.Deserialize<ListSongs[]>(content);
+                ListSongsWithId[] songs = JsonSerializer.Deserialize<ListSongsWithId[]>(content);
 
                 var table = new ConsoleTable("SONG", "ARTIST", "GENRE");
 
@@ -85,7 +84,6 @@ namespace MusicAPIClient.Handlers
                 }
                 table.Write();
                 Console.ReadKey();
-
             }
         }
 
@@ -109,10 +107,9 @@ namespace MusicAPIClient.Handlers
             }
             else
             {
-
                 string content = await response.Content.ReadAsStringAsync();
 
-                ListGenres[] genres = JsonSerializer.Deserialize<ListGenres[]>(content);
+                ListGenresWithId[] genres = JsonSerializer.Deserialize<ListGenresWithId[]>(content);
 
                 var table = new ConsoleTable("GENRE");
 
@@ -122,9 +119,7 @@ namespace MusicAPIClient.Handlers
                 }
                 table.Write();
                 Console.ReadKey();
-
             }
-
         }
 
         public static async Task ConnectSongToUser(HttpClient client, string username)
@@ -145,11 +140,68 @@ namespace MusicAPIClient.Handlers
             // 2:
             // - ange låtnamn, artist, genre
 
-
             // Disclaimer: if song does not exist => redirect to AddGenre
 
+            // Amandas förslag
 
-            throw new NotImplementedException();
+            // 1. Method returns available songs in database with songId
+            // 2. User chooses song to connect with via songId
+            // 3. Connection occurs or exception
+
+            HttpResponseMessage response = await client.GetAsync($"/song/");
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                await Console.Out.WriteLineAsync("No available songs. Press any key to return to menu and ask your admin to fill the database.");
+                Console.ReadKey();
+                return;
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to get songs. Status code: {response.StatusCode}");
+            }
+            string content = await response.Content.ReadAsStringAsync();
+
+            ListSongsWithId[] songs = JsonSerializer.Deserialize<ListSongsWithId[]>(content);
+            int amount = songs.Count();
+
+            Console.WriteLine("Available genres:");
+            for (int i = 0; i < amount; i++)
+            {
+                Console.WriteLine($"{i}. {songs[i].Name}");
+            }
+
+            Console.WriteLine("Choose a SongId:");
+            int selectedSongId;
+
+            if (!int.TryParse(Console.ReadLine(), out selectedSongId) || selectedSongId < 0 || selectedSongId >= amount)
+            {
+                Console.WriteLine("Invalid genre number.");
+                return;
+            }
+
+            // Connecting user's choosen id with song 
+            int songId = songs[selectedSongId].Id;
+
+            ConnectUserToSong connectUserToSong = new ConnectUserToSong()
+            {
+                Username = username,
+                SongId = songId
+            };
+
+            string json = JsonSerializer.Serialize(connectUserToSong);
+            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage connectResponse = await client.PostAsync($"/user/{username}/song/{songId}/", jsonContent);
+
+            if (connectResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Successfully connected {username} to song!");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to connect {username} to song.");
+            }
         }
 
         public static async Task ConnectArtistToUser(HttpClient client, string username)
@@ -158,7 +210,6 @@ namespace MusicAPIClient.Handlers
             // Part 1 checks if there are any artists to connect
             // Part 2 choose an artist to connect
             // Part 3 connect the artist to user
-
 
             // Part 1
             HttpResponseMessage response = await client.GetAsync($"/artist/");
@@ -175,7 +226,6 @@ namespace MusicAPIClient.Handlers
             string content = await response.Content.ReadAsStringAsync();
             ListArtistsWithId[] artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
             int amount = artists.Count();
-
 
             // Part 2
 
@@ -297,6 +347,70 @@ namespace MusicAPIClient.Handlers
             else
             {
                 await Console.Out.WriteLineAsync($"Congratulations, you have added {artistName} to your collection! ");
+            }
+        }
+
+        public static async Task ConnectGenreToUser(HttpClient client, string username)
+        {
+            // Amandas förslag
+
+            // 1. Method returns available genres in database with genreId
+            // 2. User chooses genre to connect with via genreId
+            // 3. Connection occurs or exception
+
+            HttpResponseMessage response = await client.GetAsync($"/genre/");
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                await Console.Out.WriteLineAsync("No available genre. Press any key to return to menu and ask your admin to fill the database.");
+                Console.ReadKey();
+                return;
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to get genres. Status code: {response.StatusCode}");
+            }
+            string content = await response.Content.ReadAsStringAsync();
+            
+            ListGenresWithId[] genres = JsonSerializer.Deserialize<ListGenresWithId[]>(content);
+            int amount = genres.Count();
+
+            Console.WriteLine("Available genres:");
+            for (int i = 0; i < amount; i++)
+            {
+                Console.WriteLine($"{i}. {genres[i].Title}");
+            }
+
+            Console.WriteLine("Choose a GenreId:");
+            int selectedGenreId;
+
+            if (!int.TryParse(Console.ReadLine(), out selectedGenreId) || selectedGenreId < 0 || selectedGenreId >= amount)
+            {
+                Console.WriteLine("Invalid genre number.");
+                return;
+            }
+
+            // Connecting user's choosen id with genre 
+            int genreId = genres[selectedGenreId].Id;
+
+            ConnectUserToGenre connectUserToGenre = new ConnectUserToGenre()
+            {
+                Username = username,
+                GenreId = genreId
+            };
+
+            string json = JsonSerializer.Serialize(connectUserToGenre);
+            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+            HttpResponseMessage connectResponse = await client.PostAsync($"/user/{username}/genre/{genreId}/", jsonContent);
+
+            if (connectResponse.IsSuccessStatusCode)
+            {
+                Console.WriteLine($"Successfully connected {username} to genre.");
+            }
+            else
+            {
+                Console.WriteLine($"Failed to connect {username} to genre.");
             }
         }
     }

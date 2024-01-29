@@ -9,9 +9,13 @@ namespace MusicAPIClient.APIModels
 {
     internal class AddArtist
     {
+        [JsonPropertyName("id")]
+        public int Id { get; set; }
         [JsonPropertyName("name")]
         public string Name { get; set; }
         [JsonPropertyName("description")]
         public string Description { get; set; }
+        [JsonPropertyName("genre")]
+        public string Genre { get; set; }
     }
 }

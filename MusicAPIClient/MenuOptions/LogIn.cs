@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using MusicAPI.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace MusicAPIClient.MenuOptions
 {

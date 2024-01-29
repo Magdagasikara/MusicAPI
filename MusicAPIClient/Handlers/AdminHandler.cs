@@ -9,6 +9,8 @@ using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using MusicAPI.Data;
 
 namespace MusicAPIClient.Handlers
 {
@@ -94,7 +96,6 @@ namespace MusicAPIClient.Handlers
 
             var response = await client.PostAsync("/genre/", jsonContent);
 
-
             if (response.IsSuccessStatusCode)
             {
                 await Console.Out.WriteLineAsync("Genre added successfully.");
@@ -168,7 +169,7 @@ namespace MusicAPIClient.Handlers
             {
                 Name = name,
                 Description = description,
-                //Genre = genre
+                Genre = genre
             };
 
             string json = JsonSerializer.Serialize(addArtist);
