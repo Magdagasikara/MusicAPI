@@ -50,10 +50,7 @@ namespace MusicAPIClient.Handlers
                 }
                 table.Write();
                 Console.ReadKey();
-
             }
-
-
         }
 
         public static async Task GetSongsForUser(HttpClient client, string username)
@@ -212,7 +209,6 @@ namespace MusicAPIClient.Handlers
                     default:
                         response = await client.GetAsync($"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}");
                         break;
-
                 }
 
                 if (response.StatusCode == HttpStatusCode.BadRequest)
@@ -239,7 +235,6 @@ namespace MusicAPIClient.Handlers
                     i++;
                 }
                 table.Write();
-
 
                 await Console.Out.WriteLineAsync("Choose number to add an artist to your collection.");
                 await Console.Out.WriteLineAsync("Press X to go back to previous menu.");

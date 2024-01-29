@@ -41,6 +41,11 @@ namespace MusicAPIClient.MenuOptions
                         await AdminHandler.AddArtist(client);
                         break;
 
+                    case "6":
+                        LogIn.LogOutUser();
+                        await LogIn.LogInUser(client);
+                        break;
+
                     case "X":
                     case "x":
                         return;
@@ -61,6 +66,7 @@ namespace MusicAPIClient.MenuOptions
             Console.WriteLine("3. To add new song");
             Console.WriteLine("4. To add new genre");
             Console.WriteLine("5. To add new artist");
+            Console.WriteLine("6. Change user");
             Console.WriteLine("X. To exit");
         }
     }

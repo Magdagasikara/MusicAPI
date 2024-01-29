@@ -11,10 +11,11 @@ namespace MusicAPIClient.MenuOptions
 {
     public static class LogIn
     {
+        private static string username;
         public static async Task LogInUser(HttpClient client)
         {
             await Console.Out.WriteAsync("Enter your username: ");
-            string username = Console.ReadLine();
+            username = Console.ReadLine();
 
             HttpResponseMessage response = await client.GetAsync($"/user/{username}");
 
@@ -53,7 +54,6 @@ namespace MusicAPIClient.MenuOptions
                 }
 
                 response = await client.GetAsync($"/user/{username}");
-
             }
 
             // if admin: go to AdminMenu
@@ -72,6 +72,19 @@ namespace MusicAPIClient.MenuOptions
                 ListUsers user = JsonSerializer.Deserialize<ListUsers>(content);
 
                 await UserMenu.UserMenuOptions(client, user.Name);
+            }
+        }
+
+        public static void LogOutUser()
+        {
+            if (!string.IsNullOrEmpty(username))
+            {
+                Console.WriteLine($"User {username} has been successfully logged out");
+                username = null;
+            }
+            else
+            {
+                Console.WriteLine("No user is currently logged in.");
             }
         }
     }

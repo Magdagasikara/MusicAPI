@@ -20,7 +20,6 @@ namespace MusicAPIClient.MenuOptions
                 await DisplayUserMenu(username);
                 string userResponse = Console.ReadLine();
 
-
                 switch (userResponse)
                 {
 
@@ -50,6 +49,11 @@ namespace MusicAPIClient.MenuOptions
                         //await UserHandler.ConnectGenreToUser(userId);                        
                         break;
 
+                    case "7":
+                        LogIn.LogOutUser();
+                        await LogIn.LogInUser(client);
+                        break;
+
                     case "x":
                     case "X":
                         return;
@@ -57,7 +61,6 @@ namespace MusicAPIClient.MenuOptions
                     default:
                         await Console.Out.WriteAsync("Invalid input, try again.");
                         break;
-
                 }
             }
         }
@@ -73,6 +76,7 @@ namespace MusicAPIClient.MenuOptions
             Console.WriteLine("4. To add a new artist to your collection");
             Console.WriteLine("5. To add a new song to your collection");
             Console.WriteLine("6. To add a new genre to your collection");
+            Console.WriteLine("7. Change user");
             Console.WriteLine("X. To exit.");
         }
     }

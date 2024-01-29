@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ConsoleTables;
+using Microsoft.AspNetCore.Http;
 using MusicAPI.Models;
 using MusicAPIClient.APIModels;
 using System;
@@ -28,10 +29,14 @@ namespace MusicAPIClient.Handlers
 
             ListUsers[] listUsers = JsonSerializer.Deserialize<ListUsers[]>(content);
 
+            var table = new ConsoleTable("USERNAME");
+
             foreach (var user in listUsers)
             {
-                await Console.Out.WriteLineAsync($"Username:{user.Name}");
+                table.AddRow(user.Name);
             }
+            table.Write();
+            Console.ReadKey();
 
             await Console.Out.WriteLineAsync("Press enter to return to menu");
             Console.ReadLine();
