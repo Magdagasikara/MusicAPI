@@ -37,7 +37,7 @@ namespace MusicAPIClient.Handlers
             {
                 table.AddRow(user.Name);
             }
-            table.Write();
+            table.Write(Format.Minimal);
             Console.ReadKey();
 
             await Console.Out.WriteLineAsync("Press enter to return to menu");

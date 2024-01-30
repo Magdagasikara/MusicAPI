@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPIClient.Helpers;
 
 namespace MusicAPIClient.MenuOptions
 {
@@ -43,14 +44,11 @@ namespace MusicAPIClient.MenuOptions
                         await AdminHandler.AddArtist(client);
                         break;
 
-                    case "6":
+                    case "X":
+                    case "x":
                         LogIn.LogOutUser();
                         await LogIn.LogInUser(client);
                         break;
-
-                    case "X":
-                    case "x":
-                        return;
 
                     default:
                         await Console.Out.WriteLineAsync("Invalid input, try again.");
@@ -61,15 +59,26 @@ namespace MusicAPIClient.MenuOptions
 
         static async Task DisplayAdminMenu(string username)
         {
-            Console.WriteLine($"Welcome to Music API {username}! Please enter:");
-            Console.WriteLine("----------------------------------------------");
+            Console.Clear();
+            MenuHelper.HeaderUserAdmin(username);
             Console.WriteLine("1. To view all users");
             Console.WriteLine("2. To add new user");
             Console.WriteLine("3. To add new song");
             Console.WriteLine("4. To add new genre");
             Console.WriteLine("5. To add new artist");
-            Console.WriteLine("6. Change user");
-            Console.WriteLine("X. To exit");
+
+            // STINA
+            // Console.WriteLine("6. Add songs for top 100 (kolla med Stina beskrivning) artists");
+            // -- när success: Successfully Added Tracks, Artists and Genres
+            // app.MapGet("/spotify/top100/", nån-spotify-handler.StinaMetod utan nån mer input som returnerar IResult)
+
+            // LUKAS
+            // Console.WriteLine("7. Add 50 songs for a chosen artist");
+            // -- när success: Successfully Added Tracks, Artist and Genre
+            // app.MapGet("/spotify/{artist}/", nån-spotify-handler.LukasMetod som använder ditt artistnamn och returnerar IResult)
+
+
+            Console.WriteLine("X. Log out");
         }
     }
 }
