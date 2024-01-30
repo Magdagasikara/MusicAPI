@@ -29,7 +29,7 @@ namespace MusicAPI
             app.MapGet("/", () => "Hello klassen!");
 
             // GETS - artists/songs/genres
-            //ändra dessa 3 metoder så de bara returnerar artists utan userId?
+            //Ã¤ndra dessa 3 metoder sÃ¥ de bara returnerar artists utan userId?
             //app.MapGet("/artist/", APIArtistHandler.GetArtists);
             //app.MapGet("/genre/", APIArtistHandler.GetGenres);
             //app.MapGet("/song/", APIArtistHandler.GetSongs);
@@ -48,36 +48,36 @@ namespace MusicAPI
 
 
 
-            // skapa liknande 3 metoder i UserRepo som heter istället "GetArtistForUser" etc?
+            // skapa liknande 3 metoder i UserRepo som heter istÃ¤llet "GetArtistForUser" etc?
             app.MapGet("/artist/", APIArtistHandler.GetArtists);
             app.MapGet("/genre/", APIArtistHandler.GetGenres);
             app.MapGet("/song/", APIArtistHandler.GetSongs);
 
             // POSTS - user
-            /* ------------------------KOMMENTERAT UT FÖR ERROR------------------------------------------------------
+            /* ------------------------KOMMENTERAT UT FÃ–R ERROR------------------------------------------------------
             app.MapPost("/user/", APIUserHandler.AddUser);
             app.MapPost("/user/{userId}/song/{songId}", APIUserHandler.ConnectSongToUser);
             app.MapPost("/user/{userId}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
             app.MapPost("/user/{userId}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
-            ---------------------------KOMMENTERAT UT FÖR ERROR------------------------------------------------------*/
+            ---------------------------KOMMENTERAT UT FÃ–R ERROR------------------------------------------------------*/
 
 
             // testa mer era clientId och clientSecret
 
-            string clientId = "57ff66b5ae534d66be556b1e416fe7da";
-            string clientSecret = "ae2bdf6887094f2f9ab562ce5bf986f7";
+            string clientId = "";
+            string clientSecret = "";
 
 
-            // här hämtar jag min token och skriver ut den i konsolen för att använda den i Insomnia
+            // hÃ¤r hÃ¤mtar jag min token och skriver ut den i konsolen fÃ¶r att anvÃ¤nda den i Insomnia
             // den ska in under Auth-Bearer Token
             var spotifyHelper = app.Services.GetRequiredService<ISpotifyHelper>();
             string token = await spotifyHelper.GetToken(clientId, clientSecret);
             await Console.Out.WriteLineAsync(token);
 
 
-            // här testar jag med en av testsökvägar för Spotify
-            // den är hårdkodad i metoden just nu och returnerar json som string, bara som test
-            // skriver ut den i konsolen för att se att den funkat
+            // hÃ¤r testar jag med en av testsÃ¶kvÃ¤gar fÃ¶r Spotify
+            // den Ã¤r hÃ¥rdkodad i metoden just nu och returnerar json som string, bara som test
+            // skriver ut den i konsolen fÃ¶r att se att den funkat
             string xx = await spotifyHelper.TryGetSthFromSpotify(token);
 
 
