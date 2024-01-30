@@ -19,4 +19,14 @@
     {
         public override string Message => "Genre not found";
     }
+
+    public class SpotifyGenreNotFoundException : Exception
+    {
+        public override string Message => "No genre found for spotify searchquery";
+    }
+
+    public class SpotifyArtistNotFoundException : Exception
+    {
+        public override string Message => "No artist found for spotify searchquery";
+    }
 }
