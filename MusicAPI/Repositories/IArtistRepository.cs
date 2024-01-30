@@ -31,11 +31,6 @@ namespace MusicAPI.Repositories
             _context = context;
         }
 
-        public DbArtistRepository(HttpClient client)
-        {
-            this.client = client;
-        }
-
         public void AddGenre(GenreDto genreDto)
         {
             if (_context.Genres.Any(g => g.Title == genreDto.Title))

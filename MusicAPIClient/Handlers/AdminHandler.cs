@@ -15,6 +15,7 @@ using MusicAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 using MusicAPI.Repositories;
 using MusicAPI.Models.Dtos;
+using System.Xml.Linq;
 
 namespace MusicAPIClient.Handlers
 {
@@ -85,36 +86,63 @@ namespace MusicAPIClient.Handlers
         // Getting 50 songs from selected artist saved to Db from Spotify API
         public static async Task Add50SongsFromArtist(HttpClient client)
         {
-            HttpResponseMessage response = await client.PostAsync("/spotify/Top100sTop10");
+            Console.Clear();
+            await Console.Out.WriteLineAsync("Which artist would you like to add top 50 songs from?");
+            string searchArtist = Console.ReadLine();
 
-            if (!response.IsSuccessStatusCode)
+            try
             {
-                throw new Exception($"Failed to list users. Status code: {response.StatusCode}");
-            }
-        
+                if (!string.IsNullOrEmpty(searchArtist))
+                {
+                    var response = await client.PostAsync($"/spotify/Top50Songs/{searchArtist}", null);
 
-            Console.WriteLine("Press any key to return to menu...");
-            Console.ReadKey();
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await Console.Out.WriteLineAsync("Songs added successfully.");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Failed to add songs. Status code: {response.StatusCode}");
+                    }
+                }
+                else
+                {
+                    await Console.Out.WriteLineAsync("Invalid artist name.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
+
+            await Console.Out.WriteLineAsync("Press enter to return to menu");
+            Console.ReadLine();
             Console.Clear();
         }
 
         // Getting top 100 artists and their top 10 songs saved to Db from Spotify API
         public static async Task AddTop100ArtistsTop10Songs(HttpClient client)
         {
-            app.MapPost("/spotify/Top50Songs/{searchArtist}");
-
             try
             {
-                await spotifyHelper.GetTop100MostPopularArtists();
-                Console.WriteLine("Top 100 artists with top 10 songs added successfully!");
+                var response = await client.PostAsync("/spotify/Top100sTop10", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    await Console.Out.WriteLineAsync("Songs added successfully.");
+                }
+                else
+                {
+                    Console.WriteLine($"Failed to add songs. Status code: {response.StatusCode}");
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Failed to add top 100 artists with top 10 songs. Error: {ex.Message}");
+                Console.WriteLine($"Error: {ex.Message}");
             }
 
-            Console.WriteLine("Press any key to return to menu...");
-            Console.ReadKey();
+            await Console.Out.WriteLineAsync("Press enter to return to menu");
+            Console.ReadLine();
             Console.Clear();
         }
     }
