@@ -314,6 +314,11 @@ namespace MusicAPI.Repositories
             var genreInDb = await _context.Genres.FirstOrDefaultAsync(g => g.Title == genreDto.Title);
             var artistInDb = await _context.Artists.FirstOrDefaultAsync(a => a.Name == artistDto.Name);
             
+            var songNamesToCheck = songDtos.Select(songDto => songDto.Name).ToList();
+            var songInDb = await _context.Songs
+                .Where(song => songNamesToCheck.Contains(song.Name))
+                .ToListAsync();
+
             if (artistInDb == null)
             {
                 Artist artist = new Artist()
@@ -331,28 +336,34 @@ namespace MusicAPI.Repositories
 
                     foreach (var songDto in songDtos)
                     {
-                        Song song = new Song
+                        if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
-                            Name = songDto.Name,
-                            Artist = artist,
-                            Genre = genre
-                        };
+                            Song song = new Song
+                            {
+                                Name = songDto.Name,
+                                Artist = artist,
+                                Genre = genre
+                            };
 
-                        _context.Add(song);
+                            _context.Add(song);
+                        }
                     }
                 }
                 else
                 {
                     foreach (var songDto in songDtos)
                     {
-                        Song song = new Song
+                        if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
-                            Name = songDto.Name,
-                            Artist = artist,
-                            Genre = genreInDb
-                        };
+                            Song song = new Song
+                            {
+                                Name = songDto.Name,
+                                Artist = artist,
+                                Genre = genreInDb
+                            };
 
-                        _context.Add(song);
+                            _context.Add(song);
+                        }
                     }
                 }
             }
@@ -360,6 +371,7 @@ namespace MusicAPI.Repositories
             {
                 if (genreInDb == null)
                 {
+                    await Console.Out.WriteLineAsync("inside genreInDb");
                     Genre genre = new Genre()
                     {
                         Title = genreDto.Title
@@ -367,28 +379,34 @@ namespace MusicAPI.Repositories
 
                     foreach (var songDto in songDtos)
                     {
-                        Song song = new Song
+                        if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
-                            Name = songDto.Name,
-                            Artist = artistInDb,
-                            Genre = genre
-                        };
+                            Song song = new Song
+                            {
+                                Name = songDto.Name,
+                                Artist = artistInDb,
+                                Genre = genre
+                            };
 
-                        _context.Add(song);
+                            _context.Add(song);
+                        } 
                     }
                 }
                 else
                 {
                     foreach (var songDto in songDtos)
                     {
-                        Song song = new Song
+                        if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
-                            Name = songDto.Name,
-                            Artist = artistInDb,
-                            Genre = genreInDb
-                        };
+                            Song song = new Song
+                            {
+                                Name = songDto.Name,
+                                Artist = artistInDb,
+                                Genre = genreInDb
+                            };
 
-                        _context.Add(song);
+                            _context.Add(song);
+                        }
                     }
                 }
             }

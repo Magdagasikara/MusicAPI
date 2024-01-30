@@ -5,7 +5,9 @@ namespace MusicAPI.Handlers
 {
     public class APISpotifyHandler
     {
+      
         public static async Task<IResult> AddArtistGenreAndTracksFromSpotify(string searchArtist, ISpotifyHelper spotifyHelper)
+
         {
             try
             {
