@@ -43,5 +43,4 @@ namespace MusicAPI.Services
             return authResult.access_token;
         }
     }
-
 }

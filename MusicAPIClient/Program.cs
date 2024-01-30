@@ -7,6 +7,9 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using MusicAPIClient.MenuOptions;
 using System.Text;
+using MusicAPI.Handlers;
+using MusicAPI.Repositories;
+using MusicAPI.Services;
 
 namespace MusicAPIClient
 {
@@ -17,7 +20,11 @@ namespace MusicAPIClient
             using (HttpClient client = new HttpClient())
             {
                 client.BaseAddress = new Uri("https://localhost:7181");
-                await LogIn.LogInUser(client);
+
+                ISpotifyHelper spotifyHelper = new SpotifyHelper(client);
+                IArtistRepository artistRepository = new DbArtistRepository(client);
+
+                await LogIn.LogInUser(client, spotifyHelper, artistRepository);
             }
         }
     }

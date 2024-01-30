@@ -9,13 +9,17 @@ using System.Threading.Tasks;
 using MusicAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using MusicAPIClient.Helpers;
+using MusicAPI.Handlers;
+using MusicAPI.Services;
+using MusicAPIClient.MenuOptions;
+using MusicAPI.Repositories;
 
 namespace MusicAPIClient.MenuOptions
 {
     public static class LogIn
     {
         private static string username;
-        public static async Task LogInUser(HttpClient client)
+        public static async Task LogInUser(HttpClient client, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
         {
             Console.Clear();
 
@@ -82,7 +86,7 @@ namespace MusicAPIClient.MenuOptions
             // if admin: go to AdminMenu
             if (username.ToUpper() == "ADMIN")
             {
-                await AdminMenu.AdminMenuOptions(client, username);
+                await AdminMenu.AdminMenuOptions(client, username, spotifyHelper, artistRepository);
             }
 
             // if user: go to UserMenu 
@@ -94,7 +98,7 @@ namespace MusicAPIClient.MenuOptions
 
                 ListUsers user = JsonSerializer.Deserialize<ListUsers>(content);
 
-                await UserMenu.UserMenuOptions(client, user.Name);
+                await UserMenu.UserMenuOptions(client, user.Name, spotifyHelper, artistRepository);
             }
         }
 

@@ -81,10 +81,26 @@ namespace MusicAPIClient.Handlers
             Console.ReadLine();
             Console.Clear();
         }
-        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper)
+        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
         {
-            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchQuery);
+            Console.Write("Enter artist name: ");
+            string artistName = Console.ReadLine();
+
+            try
+            {
+                await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(artistName);
+                Console.WriteLine($"Songs from {artistName} added successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to add songs from {artistName}. Error: {ex.Message}");
+            }
+
+            Console.WriteLine("Press any key to return to menu...");
+            Console.ReadKey();
+            Console.Clear();
         }
+
         public static async Task AddTop100ArtistsTop10Songs(HttpClient client, ISpotifyHelper spotifyHelper)
         {
         }
