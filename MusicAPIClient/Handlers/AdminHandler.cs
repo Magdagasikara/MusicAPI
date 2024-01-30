@@ -11,6 +11,10 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using MusicAPI.Repositories;
+using MusicAPI.Models.Dtos;
 
 namespace MusicAPIClient.Handlers
 {
@@ -77,120 +81,12 @@ namespace MusicAPIClient.Handlers
             Console.ReadLine();
             Console.Clear();
         }
-
-        // Same procedure but using 'AddGenre' ApiModel to add new genre
-        public static async Task AddGenre(HttpClient client)
+        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper)
         {
-            Console.Clear();
-            Console.Write("Enter name of genre: ");
-            string title = Console.ReadLine();
-
-            AddGenre addGenre = new AddGenre()
-            {
-                Title = title,
-            };
-
-            string json = JsonSerializer.Serialize(addGenre);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/genre/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                await Console.Out.WriteLineAsync("Genre added successfully.");
-            }
-
-            else
-            {
-                Console.WriteLine($"Failed to add genre. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to menu");
-            Console.ReadLine();
-            Console.Clear();
+            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchQuery);
         }
-
-        // Api Model 'AddSong'
-        public static async Task AddSong(HttpClient client)
+        public static async Task AddTop100ArtistsTop10Songs(HttpClient client, ISpotifyHelper spotifyHelper)
         {
-            Console.Clear();
-            Console.Write("Enter name of song: ");
-            string name = Console.ReadLine();
-
-            Console.Write("Enter name of artist: ");
-            string artist = Console.ReadLine();
-
-            Console.Write("Enter name of genre: ");
-            string genre = Console.ReadLine();
-
-            AddSong addSong = new AddSong()
-            {
-                Name = name,
-                Artist = artist,
-                Genre = genre
-            };
-
-            string json = JsonSerializer.Serialize(addSong);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/song/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                await Console.Out.WriteLineAsync("song added successfully.");
-            }
-
-            else
-            {
-                Console.WriteLine($"Failed to add song. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to menu");
-            Console.ReadLine();
-            Console.Clear();
-        }
-
-        // Api Model 'AddArtist'
-        public static async Task AddArtist(HttpClient client)
-        {
-            Console.Clear();
-            Console.Write("Enter name of artist: ");
-            string name = Console.ReadLine();
-
-            Console.Write("Enter description of artist: ");
-            string description = Console.ReadLine();
-
-            Console.Write("Enter genre of artist: ");
-            string genre = Console.ReadLine();
-
-            AddArtist addArtist = new AddArtist()
-            {
-                Name = name,
-                Description = description,
-                Genre = genre
-            };
-
-            string json = JsonSerializer.Serialize(addArtist);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/artist/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                await Console.Out.WriteLineAsync("Artist added successfully.");
-            }
-
-            else
-            {
-                Console.WriteLine($"Failed to add artist. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to main menu");
-            Console.ReadLine();
-            Console.Clear();
         }
     }
 }

@@ -33,15 +33,11 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "3":
-                        await AdminHandler.AddSong(client);
+                        await AdminHandler.Add50SongsFromArtist(client);
                         break;
 
                     case "4":
-                        await AdminHandler.AddGenre(client);
-                        break;
-
-                    case "5":
-                        await AdminHandler.AddArtist(client);
+                        await AdminHandler.AddTop100ArtistsTop10Songs(client);
                         break;
 
                     case "X":
