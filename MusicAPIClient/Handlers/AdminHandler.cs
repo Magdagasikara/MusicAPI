@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 using MusicAPI.Repositories;
 using MusicAPI.Models.Dtos;
 using System.Xml.Linq;
+using MusicAPIClient.Helpers;
 
 namespace MusicAPIClient.Handlers
 {
@@ -70,12 +71,12 @@ namespace MusicAPIClient.Handlers
 
             if (response.IsSuccessStatusCode)
             {
-                await Console.Out.WriteLineAsync("User added successfully.");
+                await ConsoleHelper.PrintColorGreen($"User {name} added successfully.");
             }
 
             else
             {
-                Console.WriteLine($"Failed to add user. Status code: {response.StatusCode}");
+               await ConsoleHelper.PrintColorRed($"Failed to add user. Status code: {response.StatusCode}");
             }
 
             await Console.Out.WriteLineAsync("Press enter to return to menu");
@@ -98,16 +99,16 @@ namespace MusicAPIClient.Handlers
 
                     if (response.IsSuccessStatusCode)
                     {
-                        await Console.Out.WriteLineAsync("Songs added successfully.");
+                        await ConsoleHelper.PrintColorGreen($"Songs added successfully with {searchArtist}");
                     }
                     else
                     {
-                        Console.WriteLine($"Failed to add songs. Status code: {response.StatusCode}");
+                        await ConsoleHelper.PrintColorRed($"Failed to add songs. Status code: {response.StatusCode}");
                     }
                 }
                 else
                 {
-                    await Console.Out.WriteLineAsync("Invalid artist name.");
+                    await ConsoleHelper.PrintColorRed("Invalid artist name.");
                 }
             }
             catch (Exception ex)

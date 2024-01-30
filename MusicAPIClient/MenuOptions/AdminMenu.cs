@@ -60,8 +60,8 @@ namespace MusicAPIClient.MenuOptions
             MenuHelper.HeaderUserAdmin(username);
             Console.WriteLine("1. To view all users");
             Console.WriteLine("2. To add new user");
-            Console.WriteLine("3. Add 50 songs from chosen artist");
-            Console.WriteLine("4. Add top 100 artists with their top 10 songs");
+            Console.WriteLine("3. To add 50 songs from chosen artist");
+            Console.WriteLine("4. To add top 100 artists with their top 10 songs");
             Console.WriteLine("X. Log out");
         }
     }
