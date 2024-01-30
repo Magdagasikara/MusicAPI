@@ -49,6 +49,7 @@ namespace MusicAPI
             // POSTS - spotify
             app.MapPost("/spotify/search/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
 
+            
             app.Run();
         }
     }
