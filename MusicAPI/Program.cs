@@ -47,30 +47,7 @@ namespace MusicAPI
             app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
 
             // POSTS - spotify
-            app.MapPost("spotify/search/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
-
-            //var contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
-            //  .UseSqlServer(connectionString)
-            //    .Options;
-
-            //var context = new ApplicationContext(contextOptions);
-
-            //var httpClient = new HttpClient();
-            //httpClient.BaseAddress = new Uri("https://accounts.spotify.com/api/");
-
-            //ISpotifyAccountHelper spotifyAccountHelper = new SpotifyAccountHelper(httpClient);
-
-            //IConfiguration configuration = new ConfigurationBuilder()
-            //    .AddJsonFile("appsettings.Development.json")
-            //    .Build();
-
-            //IArtistRepository artistRepository = new DbArtistRepository(context);
-
-            //var spotifyHelper = new SpotifyHelper(httpClient, spotifyAccountHelper, configuration, artistRepository);
-
-            //await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb("d");
-
-            //await Console.Out.WriteLineAsync("Successfully Added Tracks, Artist and Genre");
+            app.MapPost("/spotify/search/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
 
             app.Run();
         }
