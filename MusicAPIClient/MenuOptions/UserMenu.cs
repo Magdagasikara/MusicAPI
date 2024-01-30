@@ -1,4 +1,5 @@
-﻿using MusicAPI.Services;
+﻿using MusicAPI.Repositories;
+using MusicAPI.Services;
 using MusicAPIClient.Handlers;
 using MusicAPIClient.Helpers;
 using System;

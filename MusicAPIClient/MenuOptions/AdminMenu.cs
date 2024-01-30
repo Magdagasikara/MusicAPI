@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
 using MusicAPIClient.Helpers;
+using MusicAPI.Repositories;
 
 namespace MusicAPIClient.MenuOptions
 {
@@ -23,7 +24,6 @@ namespace MusicAPIClient.MenuOptions
 
                 switch (userResponse)
                 {
-                    // Admin
                     case "1":
                         await AdminHandler.GetAllUsers(client);
                         break;
@@ -33,15 +33,11 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "3":
-                        await AdminHandler.AddSong(client);
+                        await AdminHandler.Add50SongsFromArtist(client);
                         break;
 
                     case "4":
-                        await AdminHandler.AddGenre(client);
-                        break;
-
-                    case "5":
-                        await AdminHandler.AddArtist(client);
+                       await AdminHandler.AddTop100ArtistsTop10Songs(client);
                         break;
 
                     case "X":
@@ -63,21 +59,8 @@ namespace MusicAPIClient.MenuOptions
             MenuHelper.HeaderUserAdmin(username);
             Console.WriteLine("1. To view all users");
             Console.WriteLine("2. To add new user");
-            Console.WriteLine("3. To add new song");
-            Console.WriteLine("4. To add new genre");
-            Console.WriteLine("5. To add new artist");
-
-            // STINA
-            // Console.WriteLine("6. Add songs for top 100 (kolla med Stina beskrivning) artists");
-            // -- när success: Successfully Added Tracks, Artists and Genres
-            // app.MapGet("/spotify/top100/", nån-spotify-handler.StinaMetod utan nån mer input som returnerar IResult)
-
-            // LUKAS
-            // Console.WriteLine("7. Add 50 songs for a chosen artist");
-            // -- när success: Successfully Added Tracks, Artist and Genre
-            // app.MapGet("/spotify/{artist}/", nån-spotify-handler.LukasMetod som använder ditt artistnamn och returnerar IResult)
-
-
+            Console.WriteLine("3. To add 50 songs from chosen artist");
+            Console.WriteLine("4. To add top 100 artists with their top 10 songs");
             Console.WriteLine("X. Log out");
         }
     }

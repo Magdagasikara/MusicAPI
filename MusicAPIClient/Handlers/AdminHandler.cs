@@ -11,6 +11,12 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
+using MusicAPI.Services;
+using Microsoft.AspNetCore.Mvc;
+using MusicAPI.Repositories;
+using MusicAPI.Models.Dtos;
+using System.Xml.Linq;
+using MusicAPIClient.Helpers;
 
 namespace MusicAPIClient.Handlers
 {
@@ -65,12 +71,12 @@ namespace MusicAPIClient.Handlers
 
             if (response.IsSuccessStatusCode)
             {
-                await Console.Out.WriteLineAsync("User added successfully.");
+                await ConsoleHelper.PrintColorGreen($"User {name} added successfully.");
             }
 
             else
             {
-                Console.WriteLine($"Failed to add user. Status code: {response.StatusCode}");
+               await ConsoleHelper.PrintColorRed($"Failed to add user. Status code: {response.StatusCode}");
             }
 
             await Console.Out.WriteLineAsync("Press enter to return to menu");
@@ -78,117 +84,65 @@ namespace MusicAPIClient.Handlers
             Console.Clear();
         }
 
-        // Same procedure but using 'AddGenre' ApiModel to add new genre
-        public static async Task AddGenre(HttpClient client)
+        // Getting 50 songs from selected artist saved to Db from Spotify API
+        public static async Task Add50SongsFromArtist(HttpClient client)
         {
             Console.Clear();
-            Console.Write("Enter name of genre: ");
-            string title = Console.ReadLine();
+            await Console.Out.WriteLineAsync("Which artist would you like to add top 50 songs from?");
+            string searchArtist = Console.ReadLine();
 
-            AddGenre addGenre = new AddGenre()
+            try
             {
-                Title = title,
-            };
+                if (!string.IsNullOrEmpty(searchArtist))
+                {
+                    var response = await client.PostAsync($"/spotify/Top50Songs/{searchArtist}", null);
 
-            string json = JsonSerializer.Serialize(addGenre);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/genre/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
+                    if (response.IsSuccessStatusCode)
+                    {
+                        await ConsoleHelper.PrintColorGreen($"Songs added successfully with {searchArtist}");
+                    }
+                    else
+                    {
+                        await ConsoleHelper.PrintColorRed($"Failed to add songs. Status code: {response.StatusCode}");
+                    }
+                }
+                else
+                {
+                    await ConsoleHelper.PrintColorRed("Invalid artist name.");
+                }
+            }
+            catch (Exception ex)
             {
-                await Console.Out.WriteLineAsync("Genre added successfully.");
+                Console.WriteLine($"Error: {ex.Message}");
             }
 
-            else
-            {
-                Console.WriteLine($"Failed to add genre. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to menu");
+            await Console.Out.WriteLineAsync("Press enter to return to menu");
             Console.ReadLine();
             Console.Clear();
         }
 
-        // Api Model 'AddSong'
-        public static async Task AddSong(HttpClient client)
+        // Getting top 100 artists and their top 10 songs saved to Db from Spotify API
+        public static async Task AddTop100ArtistsTop10Songs(HttpClient client)
         {
-            Console.Clear();
-            Console.Write("Enter name of song: ");
-            string name = Console.ReadLine();
-
-            Console.Write("Enter name of artist: ");
-            string artist = Console.ReadLine();
-
-            Console.Write("Enter name of genre: ");
-            string genre = Console.ReadLine();
-
-            AddSong addSong = new AddSong()
+            try
             {
-                Name = name,
-                Artist = artist,
-                Genre = genre
-            };
+                var response = await client.PostAsync("/spotify/Top100sTop10", null);
 
-            string json = JsonSerializer.Serialize(addSong);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/song/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
+                if (response.IsSuccessStatusCode)
+                {
+                    await ConsoleHelper.PrintColorGreen("Songs added successfully.");
+                }
+                else
+                {
+                    await ConsoleHelper.PrintColorRed($"Failed to add top 100 artists top 10 songs. Status code: {response.StatusCode}");
+                }
+            }
+            catch (Exception ex)
             {
-                await Console.Out.WriteLineAsync("song added successfully.");
+                await ConsoleHelper.PrintColorRed($"Error: {ex.Message}");
             }
 
-            else
-            {
-                Console.WriteLine($"Failed to add song. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to menu");
-            Console.ReadLine();
-            Console.Clear();
-        }
-
-        // Api Model 'AddArtist'
-        public static async Task AddArtist(HttpClient client)
-        {
-            Console.Clear();
-            Console.Write("Enter name of artist: ");
-            string name = Console.ReadLine();
-
-            Console.Write("Enter description of artist: ");
-            string description = Console.ReadLine();
-
-            Console.Write("Enter genre of artist: ");
-            string genre = Console.ReadLine();
-
-            AddArtist addArtist = new AddArtist()
-            {
-                Name = name,
-                Description = description,
-                Genre = genre
-            };
-
-            string json = JsonSerializer.Serialize(addArtist);
-
-            StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync("/artist/", jsonContent);
-
-            if (response.IsSuccessStatusCode)
-            {
-                await Console.Out.WriteLineAsync("Artist added successfully.");
-            }
-
-            else
-            {
-                Console.WriteLine($"Failed to add artist. Status code: {response.StatusCode}");
-            }
-
-            await Console.Out.WriteLineAsync("Press enter to go back to main menu");
+            await Console.Out.WriteLineAsync("Press enter to return to menu");
             Console.ReadLine();
             Console.Clear();
         }

@@ -23,6 +23,5 @@ namespace MusicAPIClient.Helpers
             ConsoleHelper.PrintColorGreen("---------------------------------");
             await Console.Out.WriteLineAsync("Please enter:");
         }
-
     }
 }

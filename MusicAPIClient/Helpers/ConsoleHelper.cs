@@ -8,9 +8,7 @@ namespace MusicAPIClient.Helpers
 {
     public static class ConsoleHelper
     {
-
-       
-
+    
         public static async Task PrintColorRed(string input)
         {
 
@@ -20,7 +18,6 @@ namespace MusicAPIClient.Helpers
             Console.ForegroundColor = originalColor;
         }
 
-
         public static async Task PrintColorGreen(string input)
         {
 
@@ -29,6 +26,5 @@ namespace MusicAPIClient.Helpers
             await Console.Out.WriteLineAsync(input);
             Console.ForegroundColor = originalColor;
         }
-
     }
 }

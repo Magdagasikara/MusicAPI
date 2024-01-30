@@ -19,10 +19,10 @@ namespace MusicAPI.Services
 
     public class SpotifyHelper : ISpotifyHelper
     {
-        private readonly HttpClient _httpClient;
-        private readonly ISpotifyAccountHelper _spotifyAccountHelper;
-        private readonly IConfiguration _configuration;
-        private readonly IArtistRepository _artistRepository;
+        public HttpClient _httpClient;
+        public ISpotifyAccountHelper _spotifyAccountHelper;
+        public IConfiguration _configuration;
+        public IArtistRepository _artistRepository;
 
         public SpotifyHelper(HttpClient httpClient, ISpotifyAccountHelper spotifyAccountHelper, IConfiguration configuration, IArtistRepository artistRepository)
         {
@@ -159,7 +159,6 @@ namespace MusicAPI.Services
             }
         }
 
-
         public async Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token)
         {
             using (var httpClient = new HttpClient())
@@ -190,7 +189,6 @@ namespace MusicAPI.Services
                 await Task.Delay(2000);
                 await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, top10TracksByArtist);
             }
-        }
-        
+        }    
     }
 }

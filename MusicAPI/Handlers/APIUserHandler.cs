@@ -20,9 +20,8 @@ namespace MusicAPI.Handlers
             {
                 return Results.NotFound($"Exception {ex.Message}");
             }
-            
-
         }
+
         public static IResult GetUser(string username, IUserRepository userRepo)
         {
             try
@@ -33,9 +32,9 @@ namespace MusicAPI.Handlers
             catch(UserNotFoundException ex)
             {
                 return Results.NotFound($"Exception {ex.Message}");
-            }
-            
+            }       
         }
+
         public static IResult AddUser(UserDto user, IUserRepository userRepo)
         {
 
@@ -56,6 +55,7 @@ namespace MusicAPI.Handlers
             return Results.StatusCode((int)HttpStatusCode.Created);
 
         }
+
         public static IResult ConnectSongToUser(string username, int songId, IUserRepository userRepo)
         {
             try
@@ -77,6 +77,7 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
+
         public static IResult ConnectArtistToUser(string username, int artistId, IUserRepository userRepo)
         {
             try
@@ -98,6 +99,7 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
+
         public static IResult ConnectGenreToUser(string username, int genreId, IUserRepository userHelper, IArtistRepository artistRepo)
         {
             try

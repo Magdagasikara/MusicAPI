@@ -9,6 +9,10 @@ using System.Threading.Tasks;
 using MusicAPI.Data;
 using Microsoft.EntityFrameworkCore;
 using MusicAPIClient.Helpers;
+using MusicAPI.Handlers;
+using MusicAPI.Services;
+using MusicAPIClient.MenuOptions;
+using MusicAPI.Repositories;
 
 namespace MusicAPIClient.MenuOptions
 {

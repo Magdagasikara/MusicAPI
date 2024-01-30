@@ -25,7 +25,8 @@ namespace MusicAPI.Repositories
 
     public class DbArtistRepository : IArtistRepository
     {
-        private ApplicationContext _context;
+        public ApplicationContext _context;
+
         public DbArtistRepository(ApplicationContext context)
         {
             _context = context;
