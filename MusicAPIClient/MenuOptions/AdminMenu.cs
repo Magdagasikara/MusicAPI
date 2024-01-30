@@ -24,7 +24,6 @@ namespace MusicAPIClient.MenuOptions
 
                 switch (userResponse)
                 {
-                    // Admin
                     case "1":
                         await AdminHandler.GetAllUsers(client);
                         break;
