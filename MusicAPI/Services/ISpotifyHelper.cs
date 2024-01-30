@@ -122,8 +122,6 @@ namespace MusicAPI.Services
                     var response = await httpClient.SendAsync(request);
                     response.EnsureSuccessStatusCode();
 
-
-
                     string responseData = await response.Content.ReadAsStringAsync()!;
                     PlaylistResponse playlist = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
 
@@ -142,8 +140,8 @@ namespace MusicAPI.Services
 
                                 top100ArtistGenres.Add(new GenreDto
                                 {
-                                    Title = artist.genres[0].ToString()
-                                }); ;
+                                    Title = "Polish Metal"
+                                }) ;
                             }
                         }
                     }
@@ -153,9 +151,10 @@ namespace MusicAPI.Services
 
             for (int i = 0; i < top100Artists.Count; i++)
             {
-                //await Console.Out.WriteLineAsync($"Artist : {top100Artists[i].Name} , Genre : {top100ArtistGenres[i].Title}");
+               //await Console.Out.WriteLineAsync($"Artist : {top100Artists[i].Name} , Genre : {top100ArtistGenres[i].Title}");
 
-                //await GetTopTracksByArtist(top100Artists[i] ,token);
+
+                await GetTopTracksByArtist(top100Artists[i], top100ArtistGenres[i] ,token);
             }
         }
 
@@ -164,7 +163,6 @@ namespace MusicAPI.Services
         {
             using (var httpClient = new HttpClient())
             {
-                //dont need to save listatm
                 List<SongDto> top10TracksByArtist = new List<SongDto>();
 
                 Console.WriteLine($"sending request for spotifyID : {artist.SpotifyId}");
@@ -187,7 +185,6 @@ namespace MusicAPI.Services
                     await Console.Out.WriteLineAsync($"Artist : {artist.Name}, Track : {track.name}, Genre :  {genre.Title}");
                 }
 
-                await Task.Delay(2000);
                 await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, top10TracksByArtist);
             }
         }
