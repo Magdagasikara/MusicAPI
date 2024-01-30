@@ -12,6 +12,9 @@ namespace MusicAPI.Services
     public interface ISpotifyHelper
     {
         Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
+        Task GetTop100MostPopularArtists();
+
+        Task GetTopTracksByArtist(ArtistDto artist, string token);
     }
 
     public class SpotifyHelper : ISpotifyHelper
@@ -98,5 +101,115 @@ namespace MusicAPI.Services
                 throw new SpotifyArtistNotFoundException();
             }
         }
+
+        public async Task GetTop100MostPopularArtists()
+        {
+            var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
+
+            List<ArtistDto> top100Artists = new List<ArtistDto>();
+            List<GenreDto> top100ArtistGenres = new List<GenreDto>();
+
+            int offset = 0;
+
+            for (int i = 1; i <= 2; i++)
+            {
+                using (var httpClient = new HttpClient())
+                {
+
+                    var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/playlists/4i96DEnCkGkhBRcI9SYuc4/tracks?offset={offset}&limit=50") };
+                    request.Headers.Add("Authorization", $"Bearer {token}");
+
+                    var response = await httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    string responseData = await response.Content.ReadAsStringAsync()!;
+                    PlaylistResponse playlist = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
+
+                    foreach (Item item in playlist.Items)
+                    {
+                        foreach (Artist1 artist in item.track.artists)
+                        {
+                            if (!top100Artists.Any(a => a.Name == artist.name))
+                            {
+                                top100Artists.Add(new ArtistDto
+                                {
+                                    Name = artist.name,
+                                    Description = "",
+                                    SpotifyId = artist.id,
+                                });
+
+                                if (ReferenceEquals(item.genres, null))
+                                {
+                                    top100ArtistGenres.Add(new GenreDto
+                                    {
+                                        Title = ""
+                                    }) ;
+                                }
+
+                                else
+                                {
+                                    top100ArtistGenres.Add(new GenreDto
+                                    {
+                                        Title = item.genres[0]
+                                    }) ;
+                                }
+                            }
+                        }
+                    }
+                }
+                offset = 50;
+            }
+
+            for (int i = 0; i < top100Artists.Count; i++)
+            {
+                //await Console.Out.WriteLineAsync($"Artist : {top100Artists[i].Name} , Genre : {top100ArtistGenres[i].Title}");
+
+                await GetTopTracksByArtist(top100Artists[i] ,token);
+            }
+        }
+
+
+        public async Task GetTopTracksByArtist(ArtistDto artist, string token)
+        {
+            GenreDto genre = new GenreDto();
+
+            using (var httpClient = new HttpClient())
+            {
+                //dont need to save listatm
+                List<SongDto> top10TracksByArtist = new List<SongDto>();
+
+                Console.WriteLine($"sending request for spotifyID : {artist.SpotifyId}");
+
+                var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/artists/{artist.SpotifyId}/top-tracks?market=SE") };
+                request.Headers.Add("Authorization", $"Bearer {token}");
+
+                var response = await httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+
+                {   //uncomment to see song data
+                    //await Console.Out.WriteLineAsync(await response.Content.ReadAsStringAsync());
+                }
+
+                string responseData = await response.Content.ReadAsStringAsync()!;
+                TopTracksReponse songs = JsonSerializer.Deserialize<TopTracksReponse>(responseData)!;
+
+                foreach (Track track in songs.Tracks)
+                {
+                    top10TracksByArtist.Add(new SongDto()
+                    {
+                        Name = track.name
+                    }) ;
+                    
+                    //genre.Title = track.artists[0].genres[0];
+
+                    await Console.Out.WriteLineAsync($"Artist : {artist.Name}, Track : {track.name}, Genre :  {genre.Title}");
+                }
+
+                await Task.Delay(2000);
+                await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, top10TracksByArtist);
+            }
+        }
+        
     }
 }
