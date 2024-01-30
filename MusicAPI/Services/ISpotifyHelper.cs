@@ -29,18 +29,18 @@ namespace MusicAPI.Services
             _artistRepository = artistRepository;
         }
 
-        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery)
+        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchArtist)
         {
-            if (string.IsNullOrWhiteSpace(searchQuery))
+            if (string.IsNullOrWhiteSpace(searchArtist))
             {
-                return;
+                throw new ArgumentNullException(nameof(searchArtist));
             }
 
             var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
             _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={Uri.EscapeDataString(searchQuery)}&type=track,artist&limit=50");
+            var response = await _httpClient.GetAsync($"https://api.spotify.com/v1/search?q={Uri.EscapeDataString(searchArtist)}&type=track,artist&limit=50");
             response.EnsureSuccessStatusCode();
 
             using var responseStream = await response.Content.ReadAsStreamAsync();
@@ -74,13 +74,28 @@ namespace MusicAPI.Services
                         Name = spotifyArtist.name
                     };
 
-                    GenreDto genre = new GenreDto()
+                    if(spotifyArtist.genres.Length > 0)
                     {
-                        Title = spotifyArtist.genres[0]
-                    };
+                        GenreDto genre = new GenreDto()
+                        {
+                            Title = spotifyArtist.genres[0]
+                        };
 
-                    await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, trackList);
+                        await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, trackList);
+                    }
+                    else
+                    {
+                        throw new SpotifyGenreNotFoundException();
+                    }
                 }
+                else
+                {
+                    throw new SpotifyArtistNotFoundException();
+                }
+            }
+            else
+            {
+                throw new SpotifyArtistNotFoundException();
             }
         }
     }
