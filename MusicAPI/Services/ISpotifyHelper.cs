@@ -14,7 +14,7 @@ namespace MusicAPI.Services
         Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
         Task GetTop100MostPopularArtists();
 
-        Task GetTopTracksByArtist(ArtistDto artist, string token);
+        Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token);
     }
 
     public class SpotifyHelper : ISpotifyHelper
@@ -122,6 +122,8 @@ namespace MusicAPI.Services
                     var response = await httpClient.SendAsync(request);
                     response.EnsureSuccessStatusCode();
 
+
+
                     string responseData = await response.Content.ReadAsStringAsync()!;
                     PlaylistResponse playlist = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
 
@@ -138,21 +140,10 @@ namespace MusicAPI.Services
                                     SpotifyId = artist.id,
                                 });
 
-                                if (ReferenceEquals(item.genres, null))
+                                top100ArtistGenres.Add(new GenreDto
                                 {
-                                    top100ArtistGenres.Add(new GenreDto
-                                    {
-                                        Title = ""
-                                    }) ;
-                                }
-
-                                else
-                                {
-                                    top100ArtistGenres.Add(new GenreDto
-                                    {
-                                        Title = item.genres[0]
-                                    }) ;
-                                }
+                                    Title = artist.genres[0].ToString()
+                                }); ;
                             }
                         }
                     }
@@ -164,15 +155,13 @@ namespace MusicAPI.Services
             {
                 //await Console.Out.WriteLineAsync($"Artist : {top100Artists[i].Name} , Genre : {top100ArtistGenres[i].Title}");
 
-                await GetTopTracksByArtist(top100Artists[i] ,token);
+                //await GetTopTracksByArtist(top100Artists[i] ,token);
             }
         }
 
 
-        public async Task GetTopTracksByArtist(ArtistDto artist, string token)
+        public async Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token)
         {
-            GenreDto genre = new GenreDto();
-
             using (var httpClient = new HttpClient())
             {
                 //dont need to save listatm
@@ -186,11 +175,6 @@ namespace MusicAPI.Services
                 var response = await httpClient.SendAsync(request);
                 response.EnsureSuccessStatusCode();
 
-
-                {   //uncomment to see song data
-                    //await Console.Out.WriteLineAsync(await response.Content.ReadAsStringAsync());
-                }
-
                 string responseData = await response.Content.ReadAsStringAsync()!;
                 TopTracksReponse songs = JsonSerializer.Deserialize<TopTracksReponse>(responseData)!;
 
@@ -200,9 +184,6 @@ namespace MusicAPI.Services
                     {
                         Name = track.name
                     }) ;
-                    
-                    //genre.Title = track.artists[0].genres[0];
-
                     await Console.Out.WriteLineAsync($"Artist : {artist.Name}, Track : {track.name}, Genre :  {genre.Title}");
                 }
 
