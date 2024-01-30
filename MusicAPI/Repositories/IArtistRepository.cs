@@ -3,6 +3,7 @@ using MusicAPI.Data;
 using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
 using Microsoft.EntityFrameworkCore;
+using System.Xml.Linq;
 
 namespace MusicAPI.Repositories
 {
@@ -11,14 +12,14 @@ namespace MusicAPI.Repositories
         public void AddArtist(ArtistDto artistDto);
         public void AddSong(SongDto songDto, int artistId, int genreId);
         public void AddGenre(GenreDto genreDto);
-      
+
         public List<ArtistsViewModel> GetArtistsForUser(string username);
         public List<GenresViewModel> GetGenresForUser(string username);
         public List<SongsViewModel> GetSongsForUser(string username);
-      
+
         public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber);
-        public List<GenresViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber);
-        public List<SongsViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber);
+        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber);
+        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber);
         public Task AddArtistsGenresAndTracksFromSpotify(ArtistDto artistDto, GenreDto genreDto, List<SongDto> songDtos);
     }
 
@@ -268,11 +269,12 @@ namespace MusicAPI.Repositories
 
         }
 
-        public List<GenresViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber)
+        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber)
         {
-            List<GenresViewModel> genres = _context.Genres
-                .Select(g => new GenresViewModel
+            List<GenresWithIdViewModel> genres = _context.Genres
+                .Select(g => new GenresWithIdViewModel
                 {
+                    Id = g.Id,
                     Title = g.Title,
                 })
                 .OrderBy(g => g.Title)
@@ -283,16 +285,57 @@ namespace MusicAPI.Repositories
                 throw new Exception($"There are no available genres");
             }
 
+            // Show all genres
+            if (title is null && amountPerPage is null && pageNumber is null)
+            {
+                return genres;
+            }
+
+
+            // Show a filtered list       
+            if (title is not null)
+            {
+                genres = genres
+                        .Where(a => a.Title.ToUpper().Contains(title.ToUpper()))
+                        .ToList();
+            }
+
+            // Pagination
+            // check if amountPerPage & pageNumber are integers, otherwise return bad request
+            if (amountPerPage is not null || pageNumber is not null)
+            {
+                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
+                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                {
+                    throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
+                }
+                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
+                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                {
+                    throw new Exception($"{nameof(pageNumber)} måste vara en integer");
+                }
+
+                int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
+                int numberOfPages = (int)Math.Ceiling((decimal)genres.Count / parsedAmountPerPage);
+                int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : genres.Count % parsedAmountPerPage;
+
+                genres = genres
+                 .Skip(skipAmount)
+                 .Take(amountOnThisPage)
+                 .ToList();
+
+            }
             return genres;
         }
 
-        public List<SongsViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber)
+        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber)
         {
             var songs = _context.Songs
                             .Include(s => s.Artist)
                             .Include(s => s.Genre)
-                            .Select(s => new SongsViewModel
+                            .Select(s => new SongsWithIdViewModel
                             {
+                                Id = s.Id,
                                 Name = s.Name,
                                 Artist = s.Artist.Name,
                                 Genre = s.Genre.Title,
@@ -305,6 +348,46 @@ namespace MusicAPI.Repositories
                 throw new Exception($"There are no available songs");
             }
 
+            // Show all songs
+            if (name is null && amountPerPage is null && pageNumber is null)
+            {
+                return songs;
+            }
+
+            // Show a filtered list       
+            if (name is not null)
+            {
+                songs = songs
+                        .Where(a => a.Name.ToUpper().Contains(name.ToUpper()))
+                        .ToList();
+            }
+
+            // Pagination
+            // check if amountPerPage & pageNumber are integers, otherwise return bad request
+            if (amountPerPage is not null || pageNumber is not null)
+            {
+                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
+                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                {
+                    throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
+                }
+                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
+                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                {
+                    throw new Exception($"{nameof(pageNumber)} måste vara en integer");
+                }
+
+                int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
+                int numberOfPages = (int)Math.Ceiling((decimal)songs.Count / parsedAmountPerPage);
+                int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : songs.Count % parsedAmountPerPage;
+
+                songs = songs
+                 .Skip(skipAmount)
+                 .Take(amountOnThisPage)
+                 .ToList();
+
+            }
+
             return songs;
 
         }
@@ -313,7 +396,7 @@ namespace MusicAPI.Repositories
         {
             var genreInDb = await _context.Genres.FirstOrDefaultAsync(g => g.Title == genreDto.Title);
             var artistInDb = await _context.Artists.FirstOrDefaultAsync(a => a.Name == artistDto.Name);
-            
+       
             var songNamesToCheck = songDtos.Select(songDto => songDto.Name).ToList();
             var songInDb = await _context.Songs
                 .Where(song => songNamesToCheck.Contains(song.Name))
