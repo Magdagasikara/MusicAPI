@@ -47,9 +47,9 @@ namespace MusicAPI
             app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
 
             // POSTS - spotify
-            app.MapPost("/spotify/search/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
-            app.MapPost("/spotify/Top100MostFollowedArtistsTop10Songs", APISpotifyHandler.Top100MostFollowedArtistsTop10Songs);
-            
+            app.MapPost("/spotify/Top50Songs/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
+            app.MapPost("/spotify/Top100sTop10", APISpotifyHandler.Top100MostFollowedArtistsTop10Songs);
+
             app.Run();
         }
     }

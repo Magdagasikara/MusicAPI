@@ -14,7 +14,7 @@ namespace MusicAPIClient.MenuOptions
     public class UserMenu
     {
 
-        public static async Task UserMenuOptions(HttpClient client, string username, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
+        public static async Task UserMenuOptions(HttpClient client, string username)
         {
             while (true)
             {
@@ -52,7 +52,7 @@ namespace MusicAPIClient.MenuOptions
                     case "x":
                     case "X":
                         LogIn.LogOutUser();
-                        await LogIn.LogInUser(client, spotifyHelper, artistRepository);
+                        await LogIn.LogInUser(client);
                         break;
 
                     default:

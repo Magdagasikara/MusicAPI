@@ -19,7 +19,7 @@ namespace MusicAPIClient.MenuOptions
     public static class LogIn
     {
         private static string username;
-        public static async Task LogInUser(HttpClient client, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
+        public static async Task LogInUser(HttpClient client)
         {
             Console.Clear();
 
@@ -86,7 +86,7 @@ namespace MusicAPIClient.MenuOptions
             // if admin: go to AdminMenu
             if (username.ToUpper() == "ADMIN")
             {
-                await AdminMenu.AdminMenuOptions(client, username, spotifyHelper, artistRepository);
+                await AdminMenu.AdminMenuOptions(client, username);
             }
 
             // if user: go to UserMenu 
@@ -98,7 +98,7 @@ namespace MusicAPIClient.MenuOptions
 
                 ListUsers user = JsonSerializer.Deserialize<ListUsers>(content);
 
-                await UserMenu.UserMenuOptions(client, user.Name, spotifyHelper, artistRepository);
+                await UserMenu.UserMenuOptions(client, user.Name);
             }
         }
 

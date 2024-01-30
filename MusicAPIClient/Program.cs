@@ -21,10 +21,7 @@ namespace MusicAPIClient
             {
                 client.BaseAddress = new Uri("https://localhost:7181");
 
-                ISpotifyHelper spotifyHelper = new SpotifyHelper();
-                IArtistRepository artistRepository = new DbArtistRepository(client);
-
-                await LogIn.LogInUser(client, spotifyHelper, artistRepository);
+                await LogIn.LogInUser(client);
             }
         }
     }

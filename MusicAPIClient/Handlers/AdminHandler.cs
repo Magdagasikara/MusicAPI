@@ -83,20 +83,15 @@ namespace MusicAPIClient.Handlers
         }
 
         // Getting 50 songs from selected artist saved to Db from Spotify API
-        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper)
+        public static async Task Add50SongsFromArtist(HttpClient client)
         {
-            Console.Write("Enter artist name: ");
-            string artistName = Console.ReadLine();
+            HttpResponseMessage response = await client.PostAsync("/spotify/Top100sTop10");
 
-            try
+            if (!response.IsSuccessStatusCode)
             {
-                await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(artistName);
-                Console.WriteLine($"Songs from {artistName} added successfully!");
+                throw new Exception($"Failed to list users. Status code: {response.StatusCode}");
             }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to add songs from {artistName}. Error: {ex.Message}");
-            }
+        
 
             Console.WriteLine("Press any key to return to menu...");
             Console.ReadKey();
@@ -104,8 +99,10 @@ namespace MusicAPIClient.Handlers
         }
 
         // Getting top 100 artists and their top 10 songs saved to Db from Spotify API
-        public static async Task AddTop100ArtistsTop10Songs(HttpClient client, ISpotifyHelper spotifyHelper)
+        public static async Task AddTop100ArtistsTop10Songs(HttpClient client)
         {
+            app.MapPost("/spotify/Top50Songs/{searchArtist}");
+
             try
             {
                 await spotifyHelper.GetTop100MostPopularArtists();

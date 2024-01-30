@@ -14,7 +14,7 @@ namespace MusicAPIClient.MenuOptions
 {
     public class AdminMenu
     {
-        public static async Task AdminMenuOptions(HttpClient client, string username, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
+        public static async Task AdminMenuOptions(HttpClient client, string username)
         {
 
             while (true)
@@ -34,17 +34,17 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "3":
-                        await AdminHandler.Add50SongsFromArtist(client, spotifyHelper);
+                        await AdminHandler.Add50SongsFromArtist(client);
                         break;
 
                     case "4":
-                       await AdminHandler.AddTop100ArtistsTop10Songs(client, spotifyHelper);
+                       await AdminHandler.AddTop100ArtistsTop10Songs(client);
                         break;
 
                     case "X":
                     case "x":
                         LogIn.LogOutUser();
-                        await LogIn.LogInUser(client, spotifyHelper, artistRepository);
+                        await LogIn.LogInUser(client);
                         break;
 
                     default:
