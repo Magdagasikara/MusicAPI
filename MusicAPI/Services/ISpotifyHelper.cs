@@ -16,8 +16,8 @@ namespace MusicAPI.Services
     {
         Task<string> GetToken(string clientId, string clientSecret);
         Task<string> TryGetSthFromSpotify(string token);
-        Task<List<ArtistDto>> GetTopAllTime100(int limit, int offset, string token);
-        Task<List<SongDto>> GetTopTracksFromArtist(ArtistDto artist, string token);
+        Task GetTop100StreamedArtists(string token);
+        Task<List<SongDto>> GetTopTracksByArtist(ArtistDto artist, string token);
     }
 
     public class SpotifyHelper : ISpotifyHelper
@@ -62,27 +62,24 @@ namespace MusicAPI.Services
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<List<ArtistDto>> GetTopAllTime100(int limit, int offset,  string token)
+        //method for getting top100 most streamed artist on spotify from playlist generated for top 100 most streamed artists /Stina
+        public async Task GetTop100StreamedArtists( string token)
         {
-            using (var httpClient = new HttpClient())
+            List<ArtistDto> top100Artists = new List<ArtistDto>();
+            int offset = 0;
+
+            for (int i = 1;i <= 2; i++)
             {
-                List<ArtistDto> top100Artists = new List<ArtistDto>();
-
-                Console.WriteLine("sending request");
-                var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri("https://api.spotify.com/v1/playlists/5ABHKGoOzxkaa28ttQV9sE/tracks?offset=0&limit=50") };
-                request.Headers.Add("Authorization", $"Bearer {token}");
-                
-                var response = await httpClient.SendAsync(request);
-
-
-                //Använd ensuresuccessstatuscode istället.
-                if (response.IsSuccessStatusCode)
+                using (var httpClient = new HttpClient())
                 {
-                    {
-                        await Console.Out.WriteLineAsync(await response.Content.ReadAsStringAsync());
-                    }
-                    
+                    Console.WriteLine("sending request");
+                    var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/playlists/5ABHKGoOzxkaa28ttQV9sE/tracks?offset={offset}&limit=50") };
+                    request.Headers.Add("Authorization", $"Bearer {token}");
 
+                    var response = await httpClient.SendAsync(request);
+                    response.EnsureSuccessStatusCode();
+
+                    //Använd ensuresuccessstatuscode istället.
                     string responseData = await response.Content.ReadAsStringAsync()!;
                     PlaylistResponse playlist = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
 
@@ -92,7 +89,7 @@ namespace MusicAPI.Services
                         {
                             Console.WriteLine($"{artist.name}");
 
-                            if (!top100Artists.Any(a => a.SpotifyId == artist.id))
+                            if (!top100Artists.Any(a => a.SpotifyId == artist.id))  
                             {
                                 top100Artists.Add(new ArtistDto
                                 {
@@ -104,22 +101,26 @@ namespace MusicAPI.Services
                             }
                         }
                     }
-
-                    return top100Artists;
                 }
+                offset = 50;
+            }
 
-                else
-                {
-                    return top100Artists;
-                }
-             }
+            foreach (ArtistDto art in top100Artists)
+            {
+                //Add each Artist to DB.
+                List<SongDto>? topSongsByArtist = await GetTopTracksByArtist(art, token);
+                //check if song allready exists in list by spotify ID??
+                //
+            }
         }
 
-        public async Task<List<SongDto>> GetTopTracksFromArtist(ArtistDto artist, string token)
+        //method for getting top10 tracks from artist /Stina
+        public async Task<List<SongDto>> GetTopTracksByArtist(ArtistDto artist, string token)
         {
+            
             using (var httpClient = new HttpClient())
             {
-                List<SongDto> topSongs = new List<SongDto>();
+                List<SongDto> top100Songs = new List<SongDto>();
                 Console.WriteLine($"sending request for spotifyID : {artist.SpotifyId}");
                 Console.WriteLine($"token : {token}");
                 var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/artists/{artist.SpotifyId}/top-tracks?market=SE") };
@@ -144,22 +145,28 @@ namespace MusicAPI.Services
 
                     foreach (Track track in songs.Tracks)
                     {
-                        topSongs.Add(new SongDto
-                        {
-                            //add artists instead of one artist?!
-                            Artist = artist.Name,
+                        SongDto song = new SongDto() {
                             Name = track.name,
+                            ,
                             SpotifyId = track.id
-                        });
-                    }
+                        };
 
-                    return topSongs;
+                        foreach (Artist1 a in track.artists)
+                        {
+                            song.Artists.Add(new ArtistDto()
+                            {
+                                Name = a.name,
+                                SpotifyId= a.id,
+                            });
+                        }
+                    }
+                return top100Songs;
                 }
 
                 else
                 {
                     Console.WriteLine($"not successfull status code : {response.StatusCode}");
-                    return topSongs;
+                    return top100Songs;
                 }
             }
         }

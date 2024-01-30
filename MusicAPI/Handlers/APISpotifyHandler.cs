@@ -1,5 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
+using MusicAPI.Services;
+using Microsoft.EntityFrameworkCore;
+using System.Net;
+using MusicAPI.Models.Dtos;
+using Microsoft.AspNetCore.Mvc.Filters;
 
 namespace MusicAPI.Handlers
 {
@@ -28,6 +33,20 @@ namespace MusicAPI.Handlers
             _clientSecret = clientSecret;
         }
 
-        
+
+        // fix so that methods run via handlers //STina
+        //public async Task<IResult> AddTop100ArtistsWithTop10Tracks(string token)
+        //{
+        //    try
+        //    {
+        //        await new ISpotifyHelper.GetTop100StreamedArtists(token);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return Results.BadRequest(ex);
+        //    }
+
+        //    return Results.StatusCode((int)HttpStatusCode.Created);
+        //}
     }
 }

@@ -75,19 +75,33 @@ namespace MusicAPI.Repositories
 
         public void AddSong(SongDto songDto, int artistId, int genreId)
         {
-            var artist = _context.Artists.SingleOrDefault(a => a.Id == artistId)
+            /* remove to check if artists and genre exists else add before adding song in order artist -> genre -> song //Stina
+             var artist = _context.Artists.SingleOrDefault(a => a.Id == artistId)
             ?? throw new ArtistNotFoundException();
 
             var genre = _context.Genres.SingleOrDefault(g => g.Id == genreId)
             ?? throw new GenreNotFoundException();
+            */
 
             var newSong = new Song
             {
-                Name = songDto.Name,
-                Artist = artist,
-                Genre = genre
+                Name = songDto.Name
             };
 
+           foreach (ArtistDto art in songDto.Artists)
+            {
+                //if artist allready exists, dont create a new, else do.
+                if (_context.Artists.Any(a => a.SpotifyId == art.SpotifyId))
+                {
+                    
+                }
+
+
+
+                 //if artist doesn't exist, add it to
+            }
+
+           
             _context.Songs.Add(newSong);
             _context.SaveChanges();
         }

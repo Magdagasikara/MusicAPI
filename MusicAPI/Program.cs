@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using MusicAPI.Data;
 using MusicAPI.Handlers;
@@ -58,20 +59,17 @@ namespace MusicAPI
             app.MapPost("/user/{userId}/song/{songId}", APIUserHandler.ConnectSongToUser);
             app.MapPost("/user/{userId}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
             app.MapPost("/user/{userId}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
-            --------------------------------------------------------------------------------------------------------
-            */
+            ---------------------------KOMMENTERAT UT FÖR ERROR------------------------------------------------------*/
 
 
             // testa mer era clientId och clientSecret
 
-            string clientId = "";
-            string clientSecret = "";
+            string clientId = "57ff66b5ae534d66be556b1e416fe7da";
+            string clientSecret = "ae2bdf6887094f2f9ab562ce5bf986f7";
 
 
             // här hämtar jag min token och skriver ut den i konsolen för att använda den i Insomnia
             // den ska in under Auth-Bearer Token
-
-
             var spotifyHelper = app.Services.GetRequiredService<ISpotifyHelper>();
             string token = await spotifyHelper.GetToken(clientId, clientSecret);
             await Console.Out.WriteLineAsync(token);
@@ -80,38 +78,14 @@ namespace MusicAPI
             // här testar jag med en av testsökvägar för Spotify
             // den är hårdkodad i metoden just nu och returnerar json som string, bara som test
             // skriver ut den i konsolen för att se att den funkat
-
-
             string xx = await spotifyHelper.TryGetSthFromSpotify(token);
 
-            
+
             //used to populate database with top songs from the artists of the top 100 most streamed songs on spotify.
-            List <ArtistDto> top100ArtistsForDb = new List<ArtistDto>();
-            int offset = 0;
-            for (int i = 1; i <= 2; i++)
-            {
-                List<ArtistDto>? artistDtosForDB = await spotifyHelper.GetTopAllTime100(50, offset, token);
 
-                foreach (var art in artistDtosForDB)
-                {
-                    if (!top100ArtistsForDb.Any(a => a.SpotifyId == art.SpotifyId) )
-                    {
-                        top100ArtistsForDb.Add(art);
-                    }
-                }
-                offset = 50;
-            }
 
-            List<SongDto> songsForDB = new List<SongDto>();
-            foreach (ArtistDto artist in top100ArtistsForDb)
-            {
-                //Add each Artist to DB.
-
-                List<SongDto>? topSongsByArtist = await spotifyHelper.GetTopTracksFromArtist(artist, token);
-
-                //check if song allready exists in list by spotify ID??
-                //
-            }
+            //
+            await spotifyHelper.GetTop100StreamedArtists(token);
 
             //await Console.Out.WriteLineAsync(xx);
 
