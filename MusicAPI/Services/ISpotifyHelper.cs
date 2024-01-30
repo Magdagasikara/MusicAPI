@@ -102,60 +102,6 @@ namespace MusicAPI.Services
             }
         }
 
-
-        //public async Task GetTop100MostPopularArtists()
-        //{
-        //    var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
-
-        //    List<ArtistDto> top100Artists = new List<ArtistDto>();
-
-        //    int offset = 0;
-
-        //    for (int i = 1; i <= 2; i++)
-        //    {
-        //        using (var httpClient = new HttpClient())
-        //        {
-                    
-        //            var request = new HttpRequestMessage() { Method = HttpMethod.Get, RequestUri = new Uri($"https://api.spotify.com/v1/playlists/4i96DEnCkGkhBRcI9SYuc4/tracks?offset={offset}&limit=50") };
-        //            request.Headers.Add("Authorization", $"Bearer {token}");
-
-        //            var response = await httpClient.SendAsync(request);
-        //            response.EnsureSuccessStatusCode();
-                    
-        //            string responseData = await response.Content.ReadAsStringAsync()!;
-        //            await Console.Out.WriteLineAsync(await response.Content.ReadAsStringAsync());
-        //            PlaylistResponse playlist = JsonSerializer.Deserialize<PlaylistResponse>(responseData)!;
-
-        //            foreach (Item item in playlist.Items)
-        //            {
-        //                foreach (var artist in item.track.artists)
-        //                {
-        //                    Console.WriteLine($"{artist.name}");
-
-        //                    if (!top100Artists.Any(a => a.Name == artist.name))
-        //                    {
-        //                        top100Artists.Add(new ArtistDto
-        //                        {
-        //                            Name = artist.name,
-        //                            Description = "",
-        //                            SpotifyId = artist.id,
-        //                        });
-        //                    }
-        //                }
-        //            }
-        //        }
-        //        offset = 50;
-        //    }
-
-        //    foreach (ArtistDto artist in top100Artists)
-        //    {
-        //        await Console.Out.WriteLineAsync($"Artist : {artist.Name}");
-
-        //        await GetTopTracksByArtist(artist,  token);
-        //    }
-
-        //}
-
         public async Task GetTop100MostPopularArtists()
         {
             var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
