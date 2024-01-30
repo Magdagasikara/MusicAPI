@@ -5,11 +5,11 @@ namespace MusicAPI.Handlers
 {
     public class APISpotifyHandler
     {
-        public static IResult AddArtistGenreAndTracksFromSpotify(string searchArtist, ISpotifyHelper spotifyHelper)
+        public static async Task<IResult> AddArtistGenreAndTracksFromSpotify(string searchArtist, ISpotifyHelper spotifyHelper)
         {
             try
             {
-                spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchArtist);
+                await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchArtist);
             }
             catch (Exception ex)
             {
