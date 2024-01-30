@@ -150,19 +150,21 @@ namespace MusicAPIClient.Handlers
 
             // Part 1
 
-            Console.Clear();
-            ConsoleHelper.PrintColorGreen("To see available songs choose: ");
-            ConsoleHelper.PrintColorGreen("--------------------------------");
-            await Console.Out.WriteLineAsync("1. To see all songs in alphabetical order");
-            await Console.Out.WriteLineAsync("2. To search for an song title");
-            await Console.Out.WriteLineAsync("X. To go back to previous menu");
-
-            string input = Console.ReadLine();
+            string input = "";
             string request = "";
             string songSearch = "";
 
             while (true)
             {
+                Console.Clear();
+                ConsoleHelper.PrintColorGreen("To see available songs choose: ");
+                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await Console.Out.WriteLineAsync("1. To see all songs in alphabetical order");
+                await Console.Out.WriteLineAsync("2. To search for an song title");
+                await Console.Out.WriteLineAsync("X. To go back to previous menu");
+
+                input = Console.ReadLine();
+                
                 switch (input)
                 {
                     case "1":
@@ -181,6 +183,7 @@ namespace MusicAPIClient.Handlers
 
                     default:
                         ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        Console.ReadLine();
                         break;
 
                 }
@@ -356,19 +359,22 @@ namespace MusicAPIClient.Handlers
 
             // Part 1
 
-            Console.Clear();
-            ConsoleHelper.PrintColorGreen("To see available artists choose: ");
-            ConsoleHelper.PrintColorGreen("--------------------------------");
-            await Console.Out.WriteLineAsync("1. To see all artists in alphabetical order");
-            await Console.Out.WriteLineAsync("2. To search for an artist name");
-            await Console.Out.WriteLineAsync("X. To go back to previous menu");
-
-            string input = Console.ReadLine();
+           
+            string input = "";
             string request = "";
             string nameSearch = "";
 
             while (true)
             {
+                Console.Clear();
+                ConsoleHelper.PrintColorGreen("To see available artists choose: ");
+                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await Console.Out.WriteLineAsync("1. To see all artists in alphabetical order");
+                await Console.Out.WriteLineAsync("2. To search for an artist name");
+                await Console.Out.WriteLineAsync("X. To go back to previous menu");
+                
+                input = Console.ReadLine();
+
                 switch (input)
                 {
                     case "1":
@@ -387,6 +393,7 @@ namespace MusicAPIClient.Handlers
 
                     default:
                         ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        Console.ReadLine();
                         break;
 
                 }
@@ -561,19 +568,21 @@ namespace MusicAPIClient.Handlers
 
             // Part 1
 
-            Console.Clear();
-            ConsoleHelper.PrintColorGreen("To see available genres choose: ");
-            ConsoleHelper.PrintColorGreen("--------------------------------");
-            await Console.Out.WriteLineAsync("1. To see all genres in alphabetical order");
-            await Console.Out.WriteLineAsync("2. To search for a specific genre");
-            await Console.Out.WriteLineAsync("X. To go back to previous menu");
-
-            string input = Console.ReadLine();
+            string input = "";
             string request = "";
             string genreSearch = "";
 
             while (true)
             {
+                Console.Clear();
+                ConsoleHelper.PrintColorGreen("To see available genres choose: ");
+                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await Console.Out.WriteLineAsync("1. To see all genres in alphabetical order");
+                await Console.Out.WriteLineAsync("2. To search for a specific genre");
+                await Console.Out.WriteLineAsync("X. To go back to previous menu");
+
+                input = Console.ReadLine();
+
                 switch (input)
                 {
                     case "1":
@@ -592,6 +601,7 @@ namespace MusicAPIClient.Handlers
 
                     default:
                         ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        Console.ReadLine();
                         break;
 
                 }
