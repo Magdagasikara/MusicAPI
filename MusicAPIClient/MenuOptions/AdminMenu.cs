@@ -34,11 +34,11 @@ namespace MusicAPIClient.MenuOptions
                         break;
 
                     case "3":
-                        await AdminHandler.Add50SongsFromArtist(client, spotifyHelper, artistRepository);
+                        await AdminHandler.Add50SongsFromArtist(client, spotifyHelper);
                         break;
 
                     case "4":
-                       // await AdminHandler.AddTop100ArtistsTop10Songs(client);
+                       await AdminHandler.AddTop100ArtistsTop10Songs(client, spotifyHelper);
                         break;
 
                     case "X":

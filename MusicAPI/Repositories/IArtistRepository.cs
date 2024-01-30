@@ -24,10 +24,16 @@ namespace MusicAPI.Repositories
 
     public class DbArtistRepository : IArtistRepository
     {
-        private ApplicationContext _context;
+        public ApplicationContext _context;
+
         public DbArtistRepository(ApplicationContext context)
         {
             _context = context;
+        }
+
+        public DbArtistRepository(HttpClient client)
+        {
+            this.client = client;
         }
 
         public void AddGenre(GenreDto genreDto)

@@ -81,7 +81,9 @@ namespace MusicAPIClient.Handlers
             Console.ReadLine();
             Console.Clear();
         }
-        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper, IArtistRepository artistRepository)
+
+        // Getting 50 songs from selected artist saved to Db from Spotify API
+        public static async Task Add50SongsFromArtist(HttpClient client, ISpotifyHelper spotifyHelper)
         {
             Console.Write("Enter artist name: ");
             string artistName = Console.ReadLine();
@@ -101,8 +103,22 @@ namespace MusicAPIClient.Handlers
             Console.Clear();
         }
 
+        // Getting top 100 artists and their top 10 songs saved to Db from Spotify API
         public static async Task AddTop100ArtistsTop10Songs(HttpClient client, ISpotifyHelper spotifyHelper)
         {
+            try
+            {
+                await spotifyHelper.GetTop100MostPopularArtists();
+                Console.WriteLine("Top 100 artists with top 10 songs added successfully!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Failed to add top 100 artists with top 10 songs. Error: {ex.Message}");
+            }
+
+            Console.WriteLine("Press any key to return to menu...");
+            Console.ReadKey();
+            Console.Clear();
         }
     }
 }

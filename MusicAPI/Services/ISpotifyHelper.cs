@@ -13,16 +13,16 @@ namespace MusicAPI.Services
     {
         Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
         Task GetTop100MostPopularArtists();
-
         Task GetTopTracksByArtist(ArtistDto artist, string token);
     }
 
     public class SpotifyHelper : ISpotifyHelper
     {
-        private readonly HttpClient _httpClient;
-        private readonly ISpotifyAccountHelper _spotifyAccountHelper;
-        private readonly IConfiguration _configuration;
-        private readonly IArtistRepository _artistRepository;
+        // Erased readonly part
+        public HttpClient _httpClient;
+        public ISpotifyAccountHelper _spotifyAccountHelper;
+        public IConfiguration _configuration;
+        public IArtistRepository _artistRepository;
 
         public SpotifyHelper(HttpClient httpClient, ISpotifyAccountHelper spotifyAccountHelper, IConfiguration configuration, IArtistRepository artistRepository)
         {
@@ -222,7 +222,6 @@ namespace MusicAPI.Services
             }
         }
 
-
         public async Task GetTopTracksByArtist(ArtistDto artist, string token)
         {
             GenreDto genre = new GenreDto();
@@ -263,7 +262,6 @@ namespace MusicAPI.Services
                 await Task.Delay(2000);
                 await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, top10TracksByArtist);
             }
-        }
-        
+        }    
     }
 }

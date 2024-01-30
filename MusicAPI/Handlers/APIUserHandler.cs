@@ -77,6 +77,7 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
+
         public static IResult ConnectArtistToUser(string username, int artistId, IUserRepository userRepo)
         {
             try
@@ -98,6 +99,7 @@ namespace MusicAPI.Handlers
 
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
+
         public static IResult ConnectGenreToUser(string username, int genreId, IUserRepository userHelper, IArtistRepository artistRepo)
         {
             try
