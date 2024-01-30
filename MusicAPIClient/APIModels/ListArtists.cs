@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace MusicAPIClient.APIModels
 {
-    public class ListArtistsWithId
+    public class ListArtists
      {
         // unfortunately we need to get artistId to be able to connect users to it
         // not well designed from the beginning :/
