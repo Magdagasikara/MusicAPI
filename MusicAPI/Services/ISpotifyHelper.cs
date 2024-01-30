@@ -18,7 +18,6 @@ namespace MusicAPI.Services
 
     public class SpotifyHelper : ISpotifyHelper
     {
-        // Erased readonly part
         public HttpClient _httpClient;
         public ISpotifyAccountHelper _spotifyAccountHelper;
         public IConfiguration _configuration;
