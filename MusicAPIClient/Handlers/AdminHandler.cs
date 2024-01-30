@@ -133,7 +133,7 @@ namespace MusicAPIClient.Handlers
                 }
                 else
                 {
-                    Console.WriteLine($"Failed to add songs. Status code: {response.StatusCode}");
+                    Console.WriteLine($"Failed to add top 100 artists top 10 songs. Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
