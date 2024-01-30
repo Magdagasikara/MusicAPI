@@ -17,7 +17,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to add Genre {ex.Message}");
+                return Results.BadRequest($"Unable to add artist {ex.Message}");
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
@@ -41,7 +41,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to add Genre {ex.Message}");
+                return Results.BadRequest($"Unable to add genre {ex.Message}");
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
