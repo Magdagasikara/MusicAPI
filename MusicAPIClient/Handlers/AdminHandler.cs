@@ -130,16 +130,16 @@ namespace MusicAPIClient.Handlers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    await Console.Out.WriteLineAsync("Songs added successfully.");
+                    await ConsoleHelper.PrintColorGreen("Songs added successfully.");
                 }
                 else
                 {
-                    Console.WriteLine($"Failed to add top 100 artists top 10 songs. Status code: {response.StatusCode}");
+                    await ConsoleHelper.PrintColorRed($"Failed to add top 100 artists top 10 songs. Status code: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error: {ex.Message}");
+                await ConsoleHelper.PrintColorRed($"Error: {ex.Message}");
             }
 
             await Console.Out.WriteLineAsync("Press enter to return to menu");
