@@ -25,51 +25,58 @@ namespace MusicAPIClient.MenuOptions
             Console.SetCursorPosition(0, 0);
             MenuHelper.HeaderLogin();
 
-            await Console.Out.WriteAsync("Enter your username: ");
-            username = Console.ReadLine();
-
-            if (username.ToUpper() == "X") { return; }
-
-            HttpResponseMessage response = await client.GetAsync($"/user/{username}");
-
-            while (!response.IsSuccessStatusCode)
+            while (true)
             {
-                Console.Clear();
-                MenuHelper.HeaderLogin();
+                await Console.Out.WriteAsync("Enter your username: ");
+                username = Console.ReadLine();
 
-                await Console.Out.WriteAsync($"User {username} doesn't exist. Do you wish to create a new account? (Y/N) ");
-                string input = Console.ReadLine();
+                if (username.ToUpper() == "X") Environment.Exit(0);
+                else if (username == "") continue;
 
-                if (input.ToUpper() == "Y" || input.ToUpper() == "YES" || input.ToUpper() == "J" || input.ToUpper() == "JA")
+                HttpResponseMessage response = await client.GetAsync($"/user/{username}");
+
+                if (!response.IsSuccessStatusCode)
                 {
-                    // OBS-----
-                    // lyfta ut det till UserHandler som AddUser
-                    // --------
-                    AddUser user = new AddUser()
-                    {
-                        Name = username
-                    };
-                    string json = JsonSerializer.Serialize(user);
+                    Console.Clear();
+                    MenuHelper.HeaderLogin();
 
-                    StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+                    await Console.Out.WriteAsync($"User {username} doesn't exist. Do you wish to create a new account? (Y/N) ");
+                    string input = Console.ReadLine();
 
-                    response = await client.PostAsync("/user/", jsonContent);
-                    if (!response.IsSuccessStatusCode)
+                    if (input.ToUpper() == "Y" || input.ToUpper() == "YES" || input.ToUpper() == "J" || input.ToUpper() == "JA")
                     {
-                        ConsoleHelper.PrintColorRed($"Failed to create user (status code {response.StatusCode})");
+                        // OBS-----
+                        // lyfta ut det till UserHandler som AddUser
+                        // --------
+                        AddUser user = new AddUser()
+                        {
+                            Name = username
+                        };
+                        string json = JsonSerializer.Serialize(user);
+
+                        StringContent jsonContent = new StringContent(json, Encoding.UTF8, "application/json");
+
+                        response = await client.PostAsync("/user/", jsonContent);
+                        if (!response.IsSuccessStatusCode)
+                        {
+                            ConsoleHelper.PrintColorRed($"Failed to create user (status code {response.StatusCode})");
+                            Console.ReadKey();
+                        }
+                        // --------
+                        // lyfta ut det till UserHandler som AddUser
+                        // -----OBS
+                        response = await client.GetAsync($"/user/{username}");
+                        break;
                     }
-                    // --------
-                    // lyfta ut det till UserHandler som AddUser
-                    // -----OBS
+                    else
+                    {
+                        ConsoleHelper.PrintColorRed("\nTry to log in with another username or press X to exit.");
+                        Console.ReadKey();
+                        continue;
+                    }
                 }
-                else
-                {
-                    ConsoleHelper.PrintColorRed("You have nothing to do here without logging in. Bye bye!");
-                    Console.ReadKey();
-                    return;
-                }
-
-                response = await client.GetAsync($"/user/{username}");
+                else { break; }
+                
             }
 
             // if admin: go to AdminMenu
@@ -81,7 +88,7 @@ namespace MusicAPIClient.MenuOptions
             // if user: go to UserMenu 
             else
             {
-                response = await client.GetAsync($"/user/{username}");
+                HttpResponseMessage response = await client.GetAsync($"/user/{username}");
 
                 string content = await response.Content.ReadAsStringAsync();
 

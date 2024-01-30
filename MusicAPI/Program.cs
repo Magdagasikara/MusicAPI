@@ -13,13 +13,11 @@ namespace MusicAPI
         {
             var builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("ApplicationContext");
-            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString));
+            builder.Services.AddDbContext<ApplicationContext>(options => options.UseSqlServer(connectionString), ServiceLifetime.Scoped);
             builder.Services.AddScoped<IArtistRepository, DbArtistRepository>();
             builder.Services.AddScoped<IUserRepository, DbUserRepository>();
-            builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c =>
-            {
-                c.BaseAddress = new Uri("https://accounts.spotify.com/api/");
-            });
+            builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c => { c.BaseAddress = new Uri("https://api.spotify.com/v1/"); c.DefaultRequestHeaders.Add("Accept", "application/.json"); });
+            builder.Services.AddHttpClient<ISpotifyAccountHelper, SpotifyAccountHelper>(c => { c.BaseAddress = new Uri("https://accounts.spotify.com/api/"); });
 
             var app = builder.Build();
 
@@ -48,29 +46,11 @@ namespace MusicAPI
             app.MapPost("/user/{username}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
             app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
 
-            var contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
-              .UseSqlServer(connectionString)
-                .Options;
+            // POSTS - spotify
 
-            var context = new ApplicationContext(contextOptions);
+            app.MapPost("/spotify/search/{searchArtist}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
 
-            var httpClient = new HttpClient();
-            httpClient.BaseAddress = new Uri("https://accounts.spotify.com/api/");
-
-            ISpotifyAccountHelper spotifyAccountHelper = new SpotifyAccountHelper(httpClient);
-
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.Development.json")
-                .Build();
-
-            IArtistRepository artistRepository = new DbArtistRepository(context);
-
-            var spotifyHelper = new SpotifyHelper(httpClient, spotifyAccountHelper, configuration, artistRepository);
-
-            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb("nocny kochanek");
-
-            await Console.Out.WriteLineAsync("Successfully Added Tracks, Artist and Genre");
-
+            
             app.Run();
         }
     }
