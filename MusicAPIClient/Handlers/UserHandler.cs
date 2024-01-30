@@ -1,10 +1,13 @@
 ﻿using ConsoleTables;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
+using MusicAPI.Migrations;
 using MusicAPI.Models.ViewModel;
 using MusicAPIClient.APIModels;
+using MusicAPIClient.Helpers;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -48,7 +51,8 @@ namespace MusicAPIClient.Handlers
                 {
                     table.AddRow(artist.Name, artist.Description);
                 }
-                table.Write();
+                table.Write(Format.Minimal);
+                await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
                 Console.ReadKey();
             }
         }
@@ -82,7 +86,8 @@ namespace MusicAPIClient.Handlers
                 {
                     table.AddRow(song.Name, song.Artist, song.Genre);
                 }
-                table.Write();
+                table.Write(Format.Minimal);
+                await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
                 Console.ReadKey();
             }
         }
@@ -117,7 +122,8 @@ namespace MusicAPIClient.Handlers
                 {
                     table.AddRow(genre.Title);
                 }
-                table.Write();
+                table.Write(Format.Minimal);
+                await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
                 Console.ReadKey();
             }
         }
@@ -223,44 +229,80 @@ namespace MusicAPIClient.Handlers
             {
                 throw new Exception($"Failed to get artists. Status code: {response.StatusCode}");
             }
-            string content = await response.Content.ReadAsStringAsync();
-            ListArtistsWithId[] artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
-            int amount = artists.Count();
+            //string content = await response.Content.ReadAsStringAsync();
+            //ListArtistsWithId[] artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
+            //int amount = artists.Count();
 
             // Part 2
 
             int pageNumber = 1;
             int amountPerPage = 10;
-            int numberOfPages = (int)Math.Ceiling((decimal)amount / amountPerPage);
+            int amount = 0;
+            int numberOfPages = 0;
+            int amountOnThisPage = 0;
             int chosenArtist = 0;
+            string request = "";
+            string content = "";
+            string input = "";
+            ListArtistsWithId[] artists;
+            await Console.Out.WriteLineAsync("Here you can:");
+            await Console.Out.WriteLineAsync("1. Press 1 to see all available artists sorted alphabetically");
+            await Console.Out.WriteLineAsync("2. Type first letters of artist name to search for the artist");
+            await Console.Out.WriteLineAsync("Press X to go back to previous menu");
+
+            input = Console.ReadLine();
+
+            switch (input)
+            {
+                case "1":
+                    input = "";
+                    request = $"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                    //request = $"/artist/?pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                    break;
+
+                case "x":
+                case "X":
+                    return;
+
+                default:
+                    request = $"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                    break;
+            }
+
+
+            // This is done in two steps just to show we can use string queries with pagination
+            // Otherwise we would show 10 at a time from the same result list
+            response = await client.GetAsync($"/artist/?name={input}");
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                await Console.Out.WriteLineAsync("No available artists yet. Press any key to return to menu and ask your admin to fill the database.");
+                Console.ReadKey();
+                return;
+            }
+            else if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception($"Failed to get available artists. Status code: {response.StatusCode}");
+            }
+
+            content = await response.Content.ReadAsStringAsync();
+
+            artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
+
+            amount = artists.Count();
+            numberOfPages = (int)Math.Ceiling((decimal)amount / amountPerPage);
+            amountOnThisPage = pageNumber < numberOfPages ? amountPerPage : amount % amountPerPage;
+            // above I have prepared numbers that need to be send as parameters in a string query
 
             while (true)
             {
-                Console.Clear();
-                await Console.Out.WriteLineAsync("Here you can:");
-                await Console.Out.WriteLineAsync("1. Press 1 to see all available artists sorted alphabetically");
-                await Console.Out.WriteLineAsync("2. Type first letters of artist name to search for the artist");
-                await Console.Out.WriteLineAsync("3. Press X to go back to previous menu");
 
-                string input = Console.ReadLine();
-
-                int amountOnThisPage = pageNumber < numberOfPages ? amountPerPage : amount % amountPerPage;
-
-                switch (input)
+                if (pageNumber == 1)
                 {
-                    case "1":
-                        response = await client.GetAsync($"/artist/?pageNumber={pageNumber}&amountPerPage={amountPerPage}");
-                        break;
 
-                    case "x":
-                    case "X":
-                        return;
-
-                    default:
-                        response = await client.GetAsync($"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}");
-                        break;
                 }
 
+                request = $"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                response = await client.GetAsync(request);
                 if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
                     await Console.Out.WriteLineAsync("No available artists yet. Press any key to return to menu and ask your admin to fill the database.");
@@ -276,54 +318,75 @@ namespace MusicAPIClient.Handlers
 
                 artists = JsonSerializer.Deserialize<ListArtistsWithId[]>(content);
 
+
                 var table = new ConsoleTable("No", "ARTIST NAME", "DESCRIPTION");
 
-                int i = 1;
+                int i = amountPerPage * (pageNumber - 1) + 1;
                 foreach (var artist in artists)
                 {
                     table.AddRow(i, artist.Name, artist.Description);
                     i++;
                 }
-                table.Write();
 
-                await Console.Out.WriteLineAsync("Choose number to add an artist to your collection.");
-                await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
+                Console.Clear();
+                await Console.Out.WriteLineAsync("Available artists: ");
+                await Console.Out.WriteLineAsync("");
+                table.Write(Format.Minimal);
+
+                if (numberOfPages > 1 && pageNumber > 1)
+                {
+                    ConsoleHelper.PrintColorGreen("<= Press left to see previous page with artists.");
+                }
                 if (numberOfPages > 1 && pageNumber < numberOfPages)
                 {
-                    await Console.Out.WriteLineAsync("Press right to see next page with artists.");
+                    ConsoleHelper.PrintColorGreen("=> Press right to see next page with artists.");
                 }
-                else if (numberOfPages > 1 && pageNumber > 1)
-                {
-                    await Console.Out.WriteLineAsync("Press left to see previous page with artists.");
-                }
-                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
+                await Console.Out.WriteLineAsync("Choose number to add an artist to your collection.");
 
-                if (numberOfPages > 1 && pageNumber < numberOfPages && keyInfo.Key == ConsoleKey.RightArrow)
+                bool enterPressed = false;
+                while (!enterPressed)
                 {
-                    pageNumber++;
-                    continue;
+                    ConsoleKeyInfo keyInfo = Console.ReadKey();
 
-                }
-                if (numberOfPages > 1 && pageNumber > 1 && keyInfo.Key == ConsoleKey.LeftArrow)
-                {
-                    pageNumber--;
-                    continue;
+                    if (numberOfPages > 1 && pageNumber < numberOfPages && keyInfo.Key == ConsoleKey.RightArrow)
+                    {
+                        pageNumber++;
+                        request = $"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                        continue;
+
+                    }
+                    if (numberOfPages > 1 && pageNumber > 1 && keyInfo.Key == ConsoleKey.LeftArrow)
+                    {
+                        pageNumber--;
+                        request = $"/artist/?name={input}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
+                        continue;
+                    }
+
+                    if (keyInfo.Key == ConsoleKey.Enter)
+                    {
+                        enterPressed = true;
+                    }
+                    input += keyInfo.KeyChar;
                 }
 
-                input = keyInfo.KeyChar + Console.ReadLine();
-                if (!int.TryParse(input.ToString(), out chosenArtist) || chosenArtist < 1 || chosenArtist > amountOnThisPage)
+
+                int minArtistNumberThisTable = (pageNumber - 1) * 10 + 1; // 1 on first page but e.g. 11 on second
+                int maxArtistNumberThisTable = amountPerPage * (pageNumber - 1) + amountOnThisPage; // 1 on first page but e.g. 11 on second
+                if (!int.TryParse(input.ToString(), out chosenArtist) || chosenArtist < minArtistNumberThisTable || chosenArtist > maxArtistNumberThisTable)
                 {
                     await Console.Out.WriteLineAsync("Invalid input.");
                 }
                 else break;
             }
             // Gets id of the chosen artist in the list and artist's name 
+            int chosenArtistInList = chosenArtist - amountPerPage * (pageNumber - 1);
             int artistId = artists
-                .Skip(chosenArtist - 1)
+                .Skip(chosenArtistInList - 1)
                 .Select(a => a.Id)
                 .FirstOrDefault();
             string artistName = artists
-                .Skip(chosenArtist - 1)
+                .Skip(chosenArtistInList - 1)
                 .Select(a => a.Name)
                 .FirstOrDefault();
 
@@ -371,7 +434,7 @@ namespace MusicAPIClient.Handlers
                 throw new Exception($"Failed to get genres. Status code: {response.StatusCode}");
             }
             string content = await response.Content.ReadAsStringAsync();
-            
+
             ListGenresWithId[] genres = JsonSerializer.Deserialize<ListGenresWithId[]>(content);
             int amount = genres.Count();
 

@@ -20,7 +20,7 @@ namespace MusicAPI
             {
                 c.BaseAddress = new Uri("https://accounts.spotify.com/api/");
             });
-          
+
             var app = builder.Build();
 
             app.MapGet("/", () => "Välkommen till vår presentation klassen :)");
@@ -47,9 +47,9 @@ namespace MusicAPI
             app.MapPost("/user/{username}/song/{songId}", APIUserHandler.ConnectSongToUser);
             app.MapPost("/user/{username}/artist/{artistId}", APIUserHandler.ConnectArtistToUser);
             app.MapPost("/user/{username}/genre/{genreId}", APIUserHandler.ConnectGenreToUser);
-          
-                      var contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseSqlServer("Data Source=(LocalDB)\\MSSQLLocalDB;Initial Catalog=MusicAPI;Integrated Security=True")
+
+            var contextOptions = new DbContextOptionsBuilder<ApplicationContext>()
+              .UseSqlServer(connectionString)
                 .Options;
 
             var context = new ApplicationContext(contextOptions);
@@ -67,12 +67,11 @@ namespace MusicAPI
 
             var spotifyHelper = new SpotifyHelper(httpClient, spotifyAccountHelper, configuration, artistRepository);
 
-            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb("Rihanna");
+            await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb("nocny kochanek");
 
             await Console.Out.WriteLineAsync("Successfully Added Tracks, Artist and Genre");
-            Console.ReadLine();
-          
-                      app.Run();
+
+            app.Run();
         }
     }
 }

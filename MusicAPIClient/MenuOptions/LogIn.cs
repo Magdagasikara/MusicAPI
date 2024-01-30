@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using MusicAPI.Data;
 using Microsoft.EntityFrameworkCore;
+using MusicAPIClient.Helpers;
 
 namespace MusicAPIClient.MenuOptions
 {
@@ -16,13 +17,26 @@ namespace MusicAPIClient.MenuOptions
         private static string username;
         public static async Task LogInUser(HttpClient client)
         {
+            Console.Clear();
+
+            Console.SetCursorPosition(0, 5);
+            await Console.Out.WriteLineAsync("Press X to exit");
+
+            Console.SetCursorPosition(0, 0);
+            MenuHelper.HeaderLogin();
+
             await Console.Out.WriteAsync("Enter your username: ");
             username = Console.ReadLine();
+
+            if (username.ToUpper() == "X") { return; }
 
             HttpResponseMessage response = await client.GetAsync($"/user/{username}");
 
             while (!response.IsSuccessStatusCode)
             {
+                Console.Clear();
+                MenuHelper.HeaderLogin();
+
                 await Console.Out.WriteAsync($"User {username} doesn't exist. Do you wish to create a new account? (Y/N) ");
                 string input = Console.ReadLine();
 
@@ -42,7 +56,7 @@ namespace MusicAPIClient.MenuOptions
                     response = await client.PostAsync("/user/", jsonContent);
                     if (!response.IsSuccessStatusCode)
                     {
-                        await Console.Out.WriteLineAsync($"Failed to create user (status code {response.StatusCode})");
+                        ConsoleHelper.PrintColorRed($"Failed to create user (status code {response.StatusCode})");
                     }
                     // --------
                     // lyfta ut det till UserHandler som AddUser
@@ -50,7 +64,7 @@ namespace MusicAPIClient.MenuOptions
                 }
                 else
                 {
-                    await Console.Out.WriteLineAsync("You have nothing to do here without logging in. Bye bye!");
+                    ConsoleHelper.PrintColorRed("You have nothing to do here without logging in. Bye bye!");
                     Console.ReadKey();
                     return;
                 }
