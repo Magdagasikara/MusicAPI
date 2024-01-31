@@ -111,7 +111,7 @@ namespace MusicAPIClient.MenuOptions
             }
             else
             {
-                Console.WriteLine("No user is currently logged in.");
+                ConsoleHelper.PrintColorRed("No user is currently logged in.");
             }
         }
     }
