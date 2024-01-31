@@ -17,9 +17,9 @@ namespace MusicAPI.Repositories
         public List<GenresViewModel> GetGenresForUser(string username);
         public List<SongsViewModel> GetSongsForUser(string username);
 
-        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber);
-        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber);
-        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber);
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, string? amountPerPage, string? pageNumber);
+        public List<GenresWithIdViewModel> GetGenres(string? title, string? amountPerPage, string? pageNumber);
+        public List<SongsWithIdViewModel> GetSongs(string? name, string? amountPerPage, string? pageNumber);
         public Task AddArtistsGenresAndTracksFromSpotify(ArtistDto artistDto, GenreDto genreDto, List<SongDto> songDtos);
     }
 
@@ -207,7 +207,7 @@ namespace MusicAPI.Repositories
 
         }
 
-        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber)
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, string? amountPerPage, string? pageNumber)
         {
 
             List<ArtistsWithIdViewModel> artists = _context.Artists
@@ -242,6 +242,10 @@ namespace MusicAPI.Repositories
 
             // Pagination
             // check if amountPerPage & pageNumber are integers, otherwise return bad request
+            // if pageNumber = 0 we assume user meant = 1
+            // if amountPerPage = 0 we set default = 10
+            if (pageNumber == "0") pageNumber = "1";
+            if (amountPerPage == "0") amountPerPage = "10"; 
             if (amountPerPage is not null || pageNumber is not null)
             {
                 int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
@@ -270,7 +274,7 @@ namespace MusicAPI.Repositories
 
         }
 
-        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber)
+        public List<GenresWithIdViewModel> GetGenres(string? title, string? amountPerPage, string? pageNumber)
         {
             List<GenresWithIdViewModel> genres = _context.Genres
                 .Select(g => new GenresWithIdViewModel
@@ -303,6 +307,10 @@ namespace MusicAPI.Repositories
 
             // Pagination
             // check if amountPerPage & pageNumber are integers, otherwise return bad request
+            // if pageNumber = 0 we assume user meant = 1
+            // if amountPerPage = 0 we set default = 10
+            if (pageNumber == "0") pageNumber = "1";
+            if (amountPerPage == "0") amountPerPage = "10";
             if (amountPerPage is not null || pageNumber is not null)
             {
                 int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
@@ -329,7 +337,7 @@ namespace MusicAPI.Repositories
             return genres;
         }
 
-        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber)
+        public List<SongsWithIdViewModel> GetSongs(string? name, string? amountPerPage, string? pageNumber)
         {
             var songs = _context.Songs
                             .Include(s => s.Artist)
@@ -365,7 +373,11 @@ namespace MusicAPI.Repositories
 
             // Pagination
             // check if amountPerPage & pageNumber are integers, otherwise return bad request
-            if (amountPerPage is not null || pageNumber is not null)
+            // if pageNumber = 0 we assume user meant = 1
+            // if amountPerPage = 0 we set default = 10
+            if (pageNumber == "0") pageNumber = "1";
+            if (amountPerPage == "0") amountPerPage = "10";
+            if (!string.IsNullOrEmpty(amountPerPage) || !string.IsNullOrEmpty(pageNumber))
             {
                 int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
                 if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
@@ -397,7 +409,7 @@ namespace MusicAPI.Repositories
         {
             var genreInDb = await _context.Genres.FirstOrDefaultAsync(g => g.Title == genreDto.Title);
             var artistInDb = await _context.Artists.FirstOrDefaultAsync(a => a.Name == artistDto.Name);
-       
+
             var songNamesToCheck = songDtos.Select(songDto => songDto.Name).ToList();
             var songInDb = await _context.Songs
                 .Where(song => songNamesToCheck.Contains(song.Name))
@@ -473,7 +485,7 @@ namespace MusicAPI.Repositories
                             };
 
                             _context.Add(song);
-                        } 
+                        }
                     }
                 }
                 else

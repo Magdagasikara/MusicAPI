@@ -16,11 +16,77 @@ namespace MusicAPITests
     public class ArtistRepositoryTests
     {
         [TestMethod]
+        public void AddSong_CorrectlyAddsSongsToDb()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_AddSong")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            Artist artist = new Artist() { Id = 1, Name = "Test_Artist", Description = "Test_Description" };
+            Genre genre = new Genre() { Id = 1, Title = "Test_Genre", };
+
+            context.Artists.Add(artist);
+            context.Genres.Add(genre);
+
+            context.SaveChanges();
+
+            // Act
+            artistHelper.AddSong(new SongDto() { Name = "TestSong" }, artist.Id, genre.Id);
+
+            // Assert
+            Assert.AreEqual(1, context.Songs.Count());
+            Assert.AreEqual("TestSong", context.Songs.SingleOrDefault().Name);
+        }
+
+        [TestMethod]
+        public void AddGenre_CorrectlyAddsGenreToDb()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_AddGenres")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            GenreDto genre = new GenreDto() { Title = "Test_Genre" };
+
+            // Act
+            artistHelper.AddGenre(genre);
+
+            // Assert
+            Assert.AreEqual(1, context.Genres.Count());
+            Assert.IsTrue(context.Genres.Any(g => g.Title == genre.Title));
+        }
+
+        [TestMethod]
+        public void AddArtist_CorrectlyAddsArtistsToDb()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_AddArtist")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            ArtistDto artist = new ArtistDto() { Name = "Test_Artist", Description = "Test_Description" };
+
+            // Act
+            artistHelper.AddArtist(artist);
+
+            // Assert
+            Assert.AreEqual(1, context.Artists.Count());
+            Assert.IsTrue(context.Artists.Any(a => a.Name == artist.Name));
+        }
+
+        [TestMethod]
         public void GetArtistsForUser_GetsArtistsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_GetArtists")
+                .UseInMemoryDatabase("TestDb_GetArtistsForUser")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
             DbArtistRepository artistHelper = new DbArtistRepository(context);
@@ -49,37 +115,11 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        public void AddSong_CorrectlyAddsSongsToDb()
-        {
-            // Arrange 
-            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_AddSong")
-                .Options;
-            ApplicationContext context = new ApplicationContext(options);
-            DbArtistRepository artistHelper = new DbArtistRepository(context);
-
-            Artist artist = new Artist() { Id = 1, Name = "Test_Artist", Description = "Test_Description" };
-            Genre genre = new Genre() { Id = 1, Title = "Test_Genre", };
-
-            context.Artists.Add(artist);
-            context.Genres.Add(genre);
-
-            context.SaveChanges();
-
-            // Act
-            artistHelper.AddSong(new SongDto() { Name = "TestSong" }, artist.Id, genre.Id);
-
-            // Assert
-            Assert.AreEqual(1, context.Songs.Count());
-            Assert.AreEqual("TestSong", context.Songs.SingleOrDefault().Name);
-        }
-
-        [TestMethod]
         public void GetGenresForUser_GetsGenresFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_GetGenres")
+                .UseInMemoryDatabase("TestDb_GetGenresForUser")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
             DbArtistRepository artistHelper = new DbArtistRepository(context);
@@ -140,43 +180,94 @@ namespace MusicAPITests
         }
 
         [TestMethod]
-        public void AddGenre_CorrectlyAddsGenreToDb()
+        public void GetArtists_GetsArtistsFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_AddGenres")
+                .UseInMemoryDatabase("TestDb_GetArtists")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
             DbArtistRepository artistHelper = new DbArtistRepository(context);
 
-            GenreDto genre = new GenreDto() { Title = "Test_Genre" };
+            Artist artist1 = new Artist() { Name = "Test_Artist1", Description = "Test_Description1" };
+            Artist artist2 = new Artist() { Name = "Test_Artist2", Description = "Test_Description2" };
+
+            context.Artists.AddRange(artist1, artist2);
+            context.SaveChanges();
 
             // Act
-            artistHelper.AddGenre(genre);
+            var result = artistHelper.GetArtists("", "0", "0");
 
             // Assert
-            Assert.AreEqual(1, context.Genres.Count());
-            Assert.IsTrue(context.Genres.Any(g => g.Title == genre.Title));
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Name == artist1.Name));
+            Assert.IsTrue(result.Any(a => a.Name == artist2.Name));
+            Assert.IsTrue(result.Any(a => a.Description == artist1.Description));
+            Assert.IsTrue(result.Any(a => a.Description == artist2.Description));
         }
 
         [TestMethod]
-        public void AddArtist_CorrectlyAddsArtistsToDb()
+        public void GetGenres_GetsGenresFromDb()
         {
             // Arrange 
             DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
-                .UseInMemoryDatabase("TestDb_AddArtist")
+                .UseInMemoryDatabase("TestDb_GetGenres")
                 .Options;
             ApplicationContext context = new ApplicationContext(options);
             DbArtistRepository artistHelper = new DbArtistRepository(context);
 
-            ArtistDto artist = new ArtistDto() { Name = "Test_Artist", Description = "Test_Description" };
+            Genre genre1 = new Genre() { Title = "Test_genre1" };
+            Genre genre2 = new Genre() { Title = "Test_genre2" };
+
+            context.Genres.AddRange(genre1, genre2);
+            context.SaveChanges();
 
             // Act
-            artistHelper.AddArtist(artist);
+            var result = artistHelper.GetGenres("", "0", "0");
 
             // Assert
-            Assert.AreEqual(1, context.Artists.Count());
-            Assert.IsTrue(context.Artists.Any(a => a.Name == artist.Name));
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Title == genre1.Title));
+            Assert.IsTrue(result.Any(a => a.Title == genre2.Title));
+
         }
+
+        [TestMethod]
+        public void GetSongs_GetsSongsFromDb()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_GetSongs")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            Song song1 = new Song()
+            {
+                Name = "Test_song1",
+                Artist = new Artist { Name = "TestArtist1", Description = "TestDesc1" },
+                Genre = new Genre { Title = "TestGenre1" }
+            };
+            Song song2 = new Song() { Name = "Test_song2",
+                Artist = new Artist { Name = "TestArtist2", Description = "TestDesc2" },
+                Genre = new Genre { Title = "TestGenre2" }
+            };
+
+            context.Songs.AddRange(song1, song2);
+            context.SaveChanges();
+
+            // Act
+            var result = artistHelper.GetSongs("", "0", "0");
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Name == song1.Name));
+            Assert.IsTrue(result.Any(a => a.Name == song2.Name));
+
+        }
+        // kolla även om jag skickar sökning i GEt-metoden
     }
 }
