@@ -8,8 +8,8 @@ namespace MusicAPI.Repositories
 {
     public interface IUserRepository
     {
-        public List<User> GetAllUsers();
-        public UsersViewModel GetUser(string username);
+        public List<UsersViewModel> GetAllUsers();
+        public User GetUser(string username);
         public void AddUser(UserDto userDto);
         public void ConnectSongToUser(string username, int songId);
         public void ConnectArtistToUser(string username, int artistId);
@@ -24,9 +24,14 @@ namespace MusicAPI.Repositories
             _context = context;
         }
 
-        public List<User> GetAllUsers()
+        public List<UsersViewModel> GetAllUsers()
         {
-            List<User> viewUsers = _context.Users.ToList();
+            var viewUsers = _context.Users
+                 .Select(u => new UsersViewModel
+                 {
+                 Name = u.Name,
+                 })
+                .ToList();
 
             if (viewUsers == null)
                 throw new ArgumentNullException($"No users found");
@@ -34,15 +39,18 @@ namespace MusicAPI.Repositories
             return viewUsers;
         }
 
-        public UsersViewModel GetUser(string username)
+        public User GetUser(string username)
         {
-           var user = _context.Users
-               .Where(u => u.Name.ToUpper() == username.ToUpper())
-               .Select(u => new UsersViewModel
-               {
-                   Name = u.Name,
-               })
-               .SingleOrDefault();
+            var user = _context.Users
+                .Where(u => u.Name.ToUpper() == username.ToUpper())
+                .Select(u => new User
+                {
+                    Name = u.Name,
+                    Artists = u.Artists,
+                    Songs = u.Songs,
+                    Genres = u.Genres
+                })
+                .SingleOrDefault();
 
             if (user == null)
                 throw new UserNotFoundException();
