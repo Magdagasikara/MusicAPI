@@ -8,8 +8,8 @@ namespace MusicAPI.Repositories
 {
     public interface IUserRepository
     {
-        public List<User> GetAllUsers();
-        public UsersViewModel GetUser(string username);
+        public List<UsersViewModel> GetAllUsers();
+        public UserViewModel GetUser(string username);
         public void AddUser(UserDto userDto);
         public void ConnectSongToUser(string username, int songId);
         public void ConnectArtistToUser(string username, int artistId);
@@ -24,9 +24,14 @@ namespace MusicAPI.Repositories
             _context = context;
         }
 
-        public List<User> GetAllUsers()
+        public List<UsersViewModel> GetAllUsers()
         {
-            List<User> viewUsers = _context.Users.ToList();
+            var viewUsers = _context.Users
+                 .Select(u => new UsersViewModel
+                 {
+                     Name = u.Name,
+                 })
+                .ToList();
 
             if (viewUsers == null)
                 throw new ArgumentNullException($"No users found");
@@ -34,20 +39,43 @@ namespace MusicAPI.Repositories
             return viewUsers;
         }
 
-        public UsersViewModel GetUser(string username)
+        public UserViewModel GetUser(string username)
         {
-           var user = _context.Users
-               .Where(u => u.Name.ToUpper() == username.ToUpper())
-               .Select(u => new UsersViewModel
-               {
-                   Name = u.Name,
-               })
-               .SingleOrDefault();
+            var user = _context.Users
+            .Include(u => u.Songs)
+            .ThenInclude(s => s.Artist)
+            .Include(u => u.Songs)
+            .ThenInclude(s => s.Genre)
+            .Include(u => u.Artists)
+            .Include(u => u.Genres)
+            .FirstOrDefault(u => u.Name.ToUpper() == username.ToUpper());
 
             if (user == null)
                 throw new UserNotFoundException();
 
-            return user;
+            var userViewModel = new UserViewModel
+            {
+                Name = user.Name,
+                Artists = user.Artists.Select(a => new ArtistsViewModel()
+                {
+                    Name = a.Name,
+                    Description = a.Description
+                }).ToList(),
+
+                Genres = user.Genres.Select(g => new GenresViewModel()
+                {
+                    Title = g.Title
+                }).ToList(),
+
+                Songs = user.Songs.Select(s => new SongsViewModel()
+                {
+                    Name = s.Name,
+                    Artist = s.Artist.Name,
+                    Genre = s.Genre.Title
+                }).ToList()
+            };
+
+            return userViewModel;
         }
         public void AddUser(UserDto user)
         {
