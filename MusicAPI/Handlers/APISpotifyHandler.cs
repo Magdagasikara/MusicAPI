@@ -6,12 +6,12 @@ namespace MusicAPI.Handlers
     public class APISpotifyHandler
     {
       
-        public static async Task<IResult> AddArtistGenreAndTracksFromSpotify(string searchArtist, ISpotifyHelper spotifyHelper)
+        public static async Task<IResult> AddArtistGenreAndTracksFromSpotify(string searchArtist, string description, ISpotifyHelper spotifyHelper)
 
         {
             try
             {
-                await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchArtist);
+                await spotifyHelper.SaveArtistGenreAndTrackFromSpotifyToDb(searchArtist, description);
             }
             catch (Exception ex)
             {

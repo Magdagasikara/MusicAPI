@@ -11,7 +11,7 @@ namespace MusicAPI.Services
 {
     public interface ISpotifyHelper
     {
-        Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
+        Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery, string description);
         Task GetTop100MostPopularArtists();
 
         Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token);
@@ -32,7 +32,7 @@ namespace MusicAPI.Services
             _artistRepository = artistRepository;
         }
 
-        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchArtist)
+        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchArtist, string description)
         {
             if (string.IsNullOrWhiteSpace(searchArtist))
             {
@@ -74,7 +74,8 @@ namespace MusicAPI.Services
 
                     ArtistDto artist = new ArtistDto()
                     {
-                        Name = spotifyArtist.name
+                        Name = spotifyArtist.name,
+                        Description = description
                     };
 
                     if(spotifyArtist.genres.Length > 0)

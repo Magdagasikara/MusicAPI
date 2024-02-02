@@ -4,6 +4,7 @@ using MusicAPI.Models.ViewModel;
 using MusicAPI.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Xml.Linq;
+using System.Text.RegularExpressions;
 
 namespace MusicAPI.Repositories
 {
@@ -403,12 +404,14 @@ namespace MusicAPI.Repositories
                 .Where(song => songNamesToCheck.Contains(song.Name))
                 .ToListAsync();
 
+            var distinctList = songDtos.GroupBy(n => n.Name).Select(n => n.First()).ToList();
+
             if (artistInDb == null)
             {
                 Artist artist = new Artist()
                 {
                     Name = artistDto.Name,
-                    Description = ""
+                    Description = artistDto.Description
                 };
 
                 if (genreInDb == null)
@@ -418,7 +421,7 @@ namespace MusicAPI.Repositories
                         Title = genreDto.Title
                     };
 
-                    foreach (var songDto in songDtos)
+                    foreach (var songDto in distinctList)
                     {
                         if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
@@ -435,7 +438,7 @@ namespace MusicAPI.Repositories
                 }
                 else
                 {
-                    foreach (var songDto in songDtos)
+                    foreach (var songDto in distinctList)
                     {
                         if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
@@ -461,7 +464,7 @@ namespace MusicAPI.Repositories
                         Title = genreDto.Title
                     };
 
-                    foreach (var songDto in songDtos)
+                    foreach (var songDto in distinctList    )
                     {
                         if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
@@ -478,7 +481,7 @@ namespace MusicAPI.Repositories
                 }
                 else
                 {
-                    foreach (var songDto in songDtos)
+                    foreach (var songDto in distinctList)
                     {
                         if (!songInDb.Any(s => s.Name == songDto.Name))
                         {
