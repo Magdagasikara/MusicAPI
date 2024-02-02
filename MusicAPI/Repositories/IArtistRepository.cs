@@ -18,9 +18,9 @@ namespace MusicAPI.Repositories
         public List<GenresViewModel> GetGenresForUser(string username);
         public List<SongsViewModel> GetSongsForUser(string username);
 
-        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber);
-        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber);
-        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber);
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, string? amountPerPage, string? pageNumber);
+        public List<GenresWithIdViewModel> GetGenres(string? title, string? amountPerPage, string? pageNumber);
+        public List<SongsWithIdViewModel> GetSongs(string? name, string? amountPerPage, string? pageNumber);
         public Task AddArtistsGenresAndTracksFromSpotify(ArtistDto artistDto, GenreDto genreDto, List<SongDto> songDtos);
     }
 
@@ -208,7 +208,7 @@ namespace MusicAPI.Repositories
 
         }
 
-        public List<ArtistsWithIdViewModel> GetArtists(string? name, int? amountPerPage, int? pageNumber)
+        public List<ArtistsWithIdViewModel> GetArtists(string? name, string? amountPerPage, string? pageNumber)
         {
 
             List<ArtistsWithIdViewModel> artists = _context.Artists
@@ -228,13 +228,13 @@ namespace MusicAPI.Repositories
             }
 
             // Show all artists
-            if (name is null && amountPerPage is null && pageNumber is null)
+            if (string.IsNullOrEmpty(name)&& string.IsNullOrEmpty(amountPerPage)&& string.IsNullOrEmpty(pageNumber))
             {
                 return artists;
             }
 
             // Show a filtered list       
-            if (name is not null)
+            if (!string.IsNullOrEmpty(name))
             {
                 artists = artists
                         .Where(a => a.Name.ToUpper().StartsWith(name.ToUpper()))
@@ -243,15 +243,20 @@ namespace MusicAPI.Repositories
 
             // Pagination
             // check if amountPerPage & pageNumber are integers, otherwise return bad request
-            if (amountPerPage is not null || pageNumber is not null)
+            if (!string.IsNullOrEmpty(amountPerPage) || !string.IsNullOrEmpty(pageNumber))
             {
-                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
-                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                // if one parameter is 0 or missing we set default value (we got here so at least one parameter is not missing)
+                if (pageNumber == "0" || string.IsNullOrEmpty(pageNumber)) pageNumber = "1";
+                if (amountPerPage == "0" || string.IsNullOrEmpty(amountPerPage)) amountPerPage = "10";
+
+                int parsedPageNumber = 1; //sets default value for parsed if this parameter was missing
+                int parsedAmountPerPage = 10; //sets default value for parsed if this parameter was missing
+
+                if (!int.TryParse(amountPerPage, out parsedAmountPerPage))
                 {
                     throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
                 }
-                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
-                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                if (!int.TryParse(pageNumber, out parsedPageNumber))
                 {
                     throw new Exception($"{nameof(pageNumber)} måste vara en integer");
                 }
@@ -259,6 +264,7 @@ namespace MusicAPI.Repositories
                 int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
                 int numberOfPages = (int)Math.Ceiling((decimal)artists.Count / parsedAmountPerPage);
                 int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : artists.Count % parsedAmountPerPage;
+                if (artists.Count == parsedAmountPerPage) amountOnThisPage = parsedAmountPerPage; //special case that went wrong!
 
                 artists = artists
                  .Skip(skipAmount)
@@ -271,7 +277,7 @@ namespace MusicAPI.Repositories
 
         }
 
-        public List<GenresWithIdViewModel> GetGenres(string? title, int? amountPerPage, int? pageNumber)
+        public List<GenresWithIdViewModel> GetGenres(string? title, string? amountPerPage, string? pageNumber)
         {
             List<GenresWithIdViewModel> genres = _context.Genres
                 .Select(g => new GenresWithIdViewModel
@@ -288,14 +294,14 @@ namespace MusicAPI.Repositories
             }
 
             // Show all genres
-            if (title is null && amountPerPage is null && pageNumber is null)
+            if (string.IsNullOrEmpty(title) && string.IsNullOrEmpty(amountPerPage) && string.IsNullOrEmpty(pageNumber))
             {
                 return genres;
             }
 
 
             // Show a filtered list       
-            if (title is not null)
+            if (!string.IsNullOrEmpty(title))
             {
                 genres = genres
                         .Where(a => a.Title.ToUpper().Contains(title.ToUpper()))
@@ -304,15 +310,20 @@ namespace MusicAPI.Repositories
 
             // Pagination
             // check if amountPerPage & pageNumber are integers, otherwise return bad request
-            if (amountPerPage is not null || pageNumber is not null)
+            if (!string.IsNullOrEmpty(amountPerPage) || !string.IsNullOrEmpty(pageNumber))
             {
-                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
-                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                // if one parameter is 0 or missing we set default value (we got here so at least one parameter is not missing)
+                if (pageNumber == "0" || string.IsNullOrEmpty(pageNumber)) pageNumber = "1";
+                if (amountPerPage == "0" || string.IsNullOrEmpty(amountPerPage)) amountPerPage = "10";
+
+                int parsedPageNumber = 1; //sets default value if only amountPerPage wasn't missing
+                int parsedAmountPerPage = 10; //sets default value if only pageNumber wasn't missing
+
+                if (!int.TryParse(amountPerPage, out parsedAmountPerPage))
                 {
                     throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
                 }
-                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
-                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                if (!int.TryParse(pageNumber, out parsedPageNumber))
                 {
                     throw new Exception($"{nameof(pageNumber)} måste vara en integer");
                 }
@@ -320,6 +331,7 @@ namespace MusicAPI.Repositories
                 int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
                 int numberOfPages = (int)Math.Ceiling((decimal)genres.Count / parsedAmountPerPage);
                 int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : genres.Count % parsedAmountPerPage;
+                if (genres.Count == parsedAmountPerPage) amountOnThisPage = parsedAmountPerPage; //special case that went wrong!
 
                 genres = genres
                  .Skip(skipAmount)
@@ -330,7 +342,7 @@ namespace MusicAPI.Repositories
             return genres;
         }
 
-        public List<SongsWithIdViewModel> GetSongs(string? name, int? amountPerPage, int? pageNumber)
+        public List<SongsWithIdViewModel> GetSongs(string? name, string? amountPerPage, string? pageNumber)
         {
             var songs = _context.Songs
                             .Include(s => s.Artist)
@@ -351,13 +363,13 @@ namespace MusicAPI.Repositories
             }
 
             // Show all songs
-            if (name is null && amountPerPage is null && pageNumber is null)
+            if (string.IsNullOrEmpty(name)&& string.IsNullOrEmpty(amountPerPage)&& string.IsNullOrEmpty(pageNumber))
             {
                 return songs;
             }
 
             // Show a filtered list       
-            if (name is not null)
+            if (!string.IsNullOrEmpty(name))
             {
                 songs = songs
                         .Where(a => a.Name.ToUpper().Contains(name.ToUpper()))
@@ -365,16 +377,21 @@ namespace MusicAPI.Repositories
             }
 
             // Pagination
-            // check if amountPerPage & pageNumber are integers, otherwise return bad request
-            if (amountPerPage is not null || pageNumber is not null)
+            // check if amountPerPage & pageNumber are integers, otherwise return bad request           
+            if (!string.IsNullOrEmpty(amountPerPage) || !string.IsNullOrEmpty(pageNumber))
             {
-                int parsedAmountPerPage = 10; //sets default value if only pageNumber not null
-                if (amountPerPage is not null && !int.TryParse(amountPerPage.ToString(), out parsedAmountPerPage))
+                // if one parameter is 0 or missing we set default value (we got here so at least one parameter is not missing)
+                if (pageNumber == "0" || string.IsNullOrEmpty(pageNumber)) pageNumber = "1";
+                if (amountPerPage == "0" || string.IsNullOrEmpty(amountPerPage)) amountPerPage = "10";
+
+                int parsedPageNumber = 1; //sets default value if only amountPerPage is not missing
+                int parsedAmountPerPage = 10; //sets default value if only pageNumber is not missing
+
+                if (!int.TryParse(amountPerPage, out parsedAmountPerPage))
                 {
                     throw new Exception($"{nameof(amountPerPage)} måste vara en integer");
                 }
-                int parsedPageNumber = 1; //sets default value if only amountPerPage not null
-                if (pageNumber is not null && !int.TryParse(pageNumber.ToString(), out parsedPageNumber))
+                if (!int.TryParse(pageNumber, out parsedPageNumber))
                 {
                     throw new Exception($"{nameof(pageNumber)} måste vara en integer");
                 }
@@ -382,6 +399,7 @@ namespace MusicAPI.Repositories
                 int skipAmount = parsedAmountPerPage * (parsedPageNumber - 1);
                 int numberOfPages = (int)Math.Ceiling((decimal)songs.Count / parsedAmountPerPage);
                 int amountOnThisPage = parsedPageNumber < numberOfPages ? parsedAmountPerPage : songs.Count % parsedAmountPerPage;
+                if (songs.Count == parsedAmountPerPage) amountOnThisPage = parsedAmountPerPage; //special case that went wrong!
 
                 songs = songs
                  .Skip(skipAmount)
@@ -398,7 +416,7 @@ namespace MusicAPI.Repositories
         {
             var genreInDb = await _context.Genres.FirstOrDefaultAsync(g => g.Title == genreDto.Title);
             var artistInDb = await _context.Artists.FirstOrDefaultAsync(a => a.Name == artistDto.Name);
-       
+
             var songNamesToCheck = songDtos.Select(songDto => songDto.Name).ToList();
             var songInDb = await _context.Songs
                 .Where(song => songNamesToCheck.Contains(song.Name))
@@ -476,7 +494,7 @@ namespace MusicAPI.Repositories
                             };
 
                             _context.Add(song);
-                        } 
+                        }
                     }
                 }
                 else

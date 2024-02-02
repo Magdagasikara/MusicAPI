@@ -17,7 +17,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to add artist {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to add artist: {ex.Message}" });
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
@@ -29,7 +29,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to add song {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to add song: {ex.Message}" });
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
@@ -41,7 +41,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to add genre {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to add genre: {ex.Message}" });
             }
             return Results.StatusCode((int)HttpStatusCode.Created);
         }
@@ -53,7 +53,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest(new {Message =$"Unable to get artists: {ex.Message}" });
+                return Results.BadRequest(new { Error = $"Unable to get artists: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetArtistsForUser(username));
         }
@@ -65,7 +65,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to get genres: {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to get genres: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetGenresForUser(username));
         }
@@ -77,13 +77,13 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to get songs: {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to get songs: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetSongsForUser(username));
 
         }
 
-        public static IResult GetArtists(HttpContext context, IArtistRepository artistRepo, string? name, int? amountPerPage, int? pageNumber)
+        public static IResult GetArtists(HttpContext context, IArtistRepository artistRepo, string? name, string? amountPerPage, string? pageNumber)
         {
             try
             {
@@ -91,12 +91,12 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest(new { Message = $"Unable to get artists: {ex.Message}" });
+                return Results.BadRequest(new { Error = $"Unable to get artists: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetArtists(name, amountPerPage, pageNumber));
         }
 
-        public static IResult GetGenres(HttpContext context, IArtistRepository artistRepo, string? title, int? amountPerPage, int? pageNumber)
+        public static IResult GetGenres(HttpContext context, IArtistRepository artistRepo, string? title, string? amountPerPage, string? pageNumber)
         {
             try
             {
@@ -104,12 +104,12 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to get genres: {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to get genres: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetGenres(title, amountPerPage, pageNumber));
         }
 
-        public static IResult GetSongs(HttpContext context, IArtistRepository artistRepo, string? name, int? amountPerPage, int? pageNumber)
+        public static IResult GetSongs(HttpContext context, IArtistRepository artistRepo, string? name, string? amountPerPage, string? pageNumber)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace MusicAPI.Handlers
             }
             catch (Exception ex)
             {
-                return Results.BadRequest($"Unable to get songs: {ex.Message}");
+                return Results.BadRequest(new { Error = $"Unable to get songs: {ex.Message}" });
             }
             return Results.Json(artistRepo.GetSongs(name, amountPerPage, pageNumber));
 

@@ -5,6 +5,7 @@ using MusicAPI.Models;
 using MusicAPI.Data;
 using MusicAPI.Models.Dtos;
 using MusicAPI.Repositories;
+using MusicAPI.Models.ViewModel;
 
 namespace MusicAPITests
 {
@@ -34,7 +35,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            List<User> result = userHelper.GetAllUsers();
+            List<UsersViewModel> result = userHelper.GetAllUsers();
 
             // Assert
             Assert.IsNotNull(result);
