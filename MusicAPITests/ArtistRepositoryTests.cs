@@ -196,7 +196,34 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetArtists("", "0", "0");
+            var result = artistHelper.GetArtists("", "", "");
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Name == artist1.Name));
+            Assert.IsTrue(result.Any(a => a.Name == artist2.Name));
+            Assert.IsTrue(result.Any(a => a.Description == artist1.Description));
+            Assert.IsTrue(result.Any(a => a.Description == artist2.Description));
+        }
+        [TestMethod]
+        public void GetArtists_GetsArtistsFromDbWithSearchQuery()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_GetArtistsWithSearchQuery")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            Artist artist1 = new Artist() { Name = "Test_Artist1", Description = "Test_Description1" };
+            Artist artist2 = new Artist() { Name = "Test_Artist2", Description = "Test_Description2" };
+
+            context.Artists.AddRange(artist1, artist2);
+            context.SaveChanges();
+
+            // Act
+            var result = artistHelper.GetArtists("T", "2", "1");
 
             // Assert
             Assert.IsNotNull(result);
@@ -224,7 +251,34 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetGenres("", "0", "0");
+            var result = artistHelper.GetGenres("", "", "");
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Title == genre1.Title));
+            Assert.IsTrue(result.Any(a => a.Title == genre2.Title));
+
+        }
+
+        [TestMethod]
+        public void GetGenres_GetsGenresFromDbWithSearchQuery()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_GetGenresWithSearchQuery")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            Genre genre1 = new Genre() { Title = "Test_genre1" };
+            Genre genre2 = new Genre() { Title = "Test_genre2" };
+
+            context.Genres.AddRange(genre1, genre2);
+            context.SaveChanges();
+
+            // Act
+            var result = artistHelper.GetGenres("T", "2", "1");
 
             // Assert
             Assert.IsNotNull(result);
@@ -250,7 +304,9 @@ namespace MusicAPITests
                 Artist = new Artist { Name = "TestArtist1", Description = "TestDesc1" },
                 Genre = new Genre { Title = "TestGenre1" }
             };
-            Song song2 = new Song() { Name = "Test_song2",
+            Song song2 = new Song()
+            {
+                Name = "Test_song2",
                 Artist = new Artist { Name = "TestArtist2", Description = "TestDesc2" },
                 Genre = new Genre { Title = "TestGenre2" }
             };
@@ -259,7 +315,7 @@ namespace MusicAPITests
             context.SaveChanges();
 
             // Act
-            var result = artistHelper.GetSongs("", "0", "0");
+            var result = artistHelper.GetSongs("", "", "");
 
             // Assert
             Assert.IsNotNull(result);
@@ -268,6 +324,42 @@ namespace MusicAPITests
             Assert.IsTrue(result.Any(a => a.Name == song2.Name));
 
         }
-        // kolla även om jag skickar sökning i GEt-metoden
+        [TestMethod]
+        public void GetSongs_GetsSongsFromDbWithSearchQuery()
+        {
+            // Arrange 
+            DbContextOptions<ApplicationContext> options = new DbContextOptionsBuilder<ApplicationContext>()
+                .UseInMemoryDatabase("TestDb_GetSongsWithSearchQuery")
+                .Options;
+            ApplicationContext context = new ApplicationContext(options);
+            DbArtistRepository artistHelper = new DbArtistRepository(context);
+
+            Song song1 = new Song()
+            {
+                Name = "Test_song1",
+                Artist = new Artist { Name = "TestArtist1", Description = "TestDesc1" },
+                Genre = new Genre { Title = "TestGenre1" }
+            };
+            Song song2 = new Song()
+            {
+                Name = "Test_song2",
+                Artist = new Artist { Name = "TestArtist2", Description = "TestDesc2" },
+                Genre = new Genre { Title = "TestGenre2" }
+            };
+
+            context.Songs.AddRange(song1, song2);
+            context.SaveChanges();
+
+            // Act
+            var result = artistHelper.GetSongs("T", "2", "1");
+
+            // Assert
+            Assert.IsNotNull(result);
+            Assert.AreEqual(2, result.Count());
+            Assert.IsTrue(result.Any(a => a.Name == song1.Name));
+            Assert.IsTrue(result.Any(a => a.Name == song2.Name));
+
+        }
+        
     }
 }
