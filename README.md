@@ -37,7 +37,7 @@ Skapa passande endpoint för funktionalitet ni lagt till ovanför t.ex. för att
 POST https://localhost:7181/spotify/Top100sTop10
 
 - Spotify: hämta och spara 50 låtar för en vald artist + lägg till artistens beskrivning  
-POST https://localhost:7181//spotify/Top50Songs/rammstein/description/Konstigt tyskt band
+POST [https://localhost:7181//spotify/Top50Songs/rammstein/desc/Konstigt tyskt band](url)
   
 
 **Extra utmaning (gör om du vill)**
