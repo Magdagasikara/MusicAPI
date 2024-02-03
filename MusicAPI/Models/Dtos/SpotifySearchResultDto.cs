@@ -2,6 +2,7 @@
 
 namespace MusicAPI.Models.Dtos
 {
+    //used to handle response to GetTop100MostPopularArtists method.
     public class PlaylistResponse
     {
         [JsonPropertyName("items")]
@@ -9,6 +10,7 @@ namespace MusicAPI.Models.Dtos
 
     }
 
+    //used to handle response to GetTopTracksByArtist method
     public class TopTracksReponse
     {
         [JsonPropertyName("tracks")]
@@ -32,6 +34,7 @@ namespace MusicAPI.Models.Dtos
         public int total { get; set; }
     }
 
+    //used to check each item in playlist
     public class Item
     {
         public External_Urls external_urls { get; set; }
@@ -82,6 +85,7 @@ namespace MusicAPI.Models.Dtos
 
     }
 
+    //used to get information about each track within each item and for each top 10 track.
     public class Track
     {
         public Album album { get; set; }
@@ -180,6 +184,7 @@ namespace MusicAPI.Models.Dtos
         public string spotify { get; set; }
     }
 
+    //used to get info about artists.
     public class Artist1
     {
         public External_Urls4 external_urls { get; set; }
