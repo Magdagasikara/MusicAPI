@@ -20,7 +20,6 @@ using MusicAPIClient.Helpers;
 
 namespace MusicAPIClient.Handlers
 {
-    // Amanda
     public class AdminHandler
     {
         // Method that collects all users in array using ApiModel 'ListUsers'
