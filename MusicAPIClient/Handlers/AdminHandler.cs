@@ -89,12 +89,14 @@ namespace MusicAPIClient.Handlers
             Console.Clear();
             await Console.Out.WriteLineAsync("Which artist would you like to add top 50 songs from?");
             string searchArtist = Console.ReadLine();
+            await Console.Out.WriteLineAsync("Describe the artist.");
+            string description = Console.ReadLine();
 
             try
             {
                 if (!string.IsNullOrEmpty(searchArtist))
                 {
-                    var response = await client.PostAsync($"/spotify/Top50Songs/{searchArtist}", null);
+                    var response = await client.PostAsync($"/spotify/Top50Songs/{searchArtist}/desc/{description}", null);
 
                     if (response.IsSuccessStatusCode)
                     {

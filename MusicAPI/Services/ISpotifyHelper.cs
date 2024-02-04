@@ -1,9 +1,7 @@
-﻿using Microsoft.Extensions.Configuration;
-using MusicAPI.Data;
-using MusicAPI.Models;
+﻿
 using MusicAPI.Models.Dtos;
 using MusicAPI.Repositories;
-using System.ComponentModel.DataAnnotations;
+
 using System.Net.Http.Headers;
 using System.Text.Json;
 
@@ -11,7 +9,7 @@ namespace MusicAPI.Services
 {
     public interface ISpotifyHelper
     {
-        Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery);
+        Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchQuery, string description);
         Task GetTop100MostPopularArtists();
 
         Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token);
@@ -32,7 +30,7 @@ namespace MusicAPI.Services
             _artistRepository = artistRepository;
         }
 
-        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchArtist)
+        public async Task SaveArtistGenreAndTrackFromSpotifyToDb(string searchArtist, string description)
         {
             if (string.IsNullOrWhiteSpace(searchArtist))
             {
@@ -74,7 +72,8 @@ namespace MusicAPI.Services
 
                     ArtistDto artist = new ArtistDto()
                     {
-                        Name = spotifyArtist.name
+                        Name = spotifyArtist.name,
+                        Description = description
                     };
 
                     if(spotifyArtist.genres.Length > 0)
@@ -102,15 +101,18 @@ namespace MusicAPI.Services
             }
         }
 
+        //Method to Get Top 100 most popular artist from generated playlist on spotify
         public async Task GetTop100MostPopularArtists()
         {
             var token = await _spotifyAccountHelper.GetToken(_configuration["Spotify:ClientId"], _configuration["Spotify:ClientSecret"]);
 
+            //Lists used to store all artists in the playlist and their genre.
             List<ArtistDto> top100Artists = new List<ArtistDto>();
             List<GenreDto> top100ArtistGenres = new List<GenreDto>();
 
             int offset = 0;
 
+            //Loops twice to get 100 songs as limit is 50.
             for (int i = 1; i <= 2; i++)
             {
                 using (var httpClient = new HttpClient())
@@ -138,6 +140,9 @@ namespace MusicAPI.Services
                                     SpotifyId = artist.id,
                                 });
 
+                                /*for some reason i cant figure out how to get the genres under artist
+                                 *I have set this as polish metal as it needs to have some genre.
+                                 */
                                 top100ArtistGenres.Add(new GenreDto
                                 {
                                     Title = "Polish Metal"
@@ -146,18 +151,18 @@ namespace MusicAPI.Services
                         }
                     }
                 }
+                //offset to load the next 50 songs the second time around
                 offset = 50;
             }
 
+            //for each artist in top100artist playlist, get top 10 tracks.
             for (int i = 0; i < top100Artists.Count; i++)
             {
-               //await Console.Out.WriteLineAsync($"Artist : {top100Artists[i].Name} , Genre : {top100ArtistGenres[i].Title}");
-
-
                 await GetTopTracksByArtist(top100Artists[i], top100ArtistGenres[i] ,token);
             }
         }
 
+        //method to get top10 tracks from artist using their spotifyID
         public async Task GetTopTracksByArtist(ArtistDto artist, GenreDto genre, string token)
         {
             using (var httpClient = new HttpClient())
@@ -175,6 +180,7 @@ namespace MusicAPI.Services
                 string responseData = await response.Content.ReadAsStringAsync()!;
                 TopTracksReponse songs = JsonSerializer.Deserialize<TopTracksReponse>(responseData)!;
 
+                //create a songDTO from each top track
                 foreach (Track track in songs.Tracks)
                 {
                     top10TracksByArtist.Add(new SongDto()
@@ -184,6 +190,7 @@ namespace MusicAPI.Services
                     await Console.Out.WriteLineAsync($"Artist : {artist.Name}, Track : {track.name}, Genre :  {genre.Title}");
                 }
 
+                //Add to database
                 await _artistRepository.AddArtistsGenresAndTracksFromSpotify(artist, genre, top10TracksByArtist);
             }
         }    
