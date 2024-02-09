@@ -49,6 +49,10 @@ namespace MusicAPIClient.MenuOptions
                         await UserHandler.ConnectGenreToUser(client, username);                        
                         break;
 
+                    case "7":
+                        await UserHandler.GetConcertsForArtist(client);
+                        break;
+
                     case "x":
                     case "X":
                         LogIn.LogOutUser();
@@ -72,6 +76,7 @@ namespace MusicAPIClient.MenuOptions
             await Console.Out.WriteLineAsync("4. To add a new artist to your collection");
             await Console.Out.WriteLineAsync("5. To add a new song to your collection");
             await Console.Out.WriteLineAsync("6. To add a new genre to your collection");
+            await Console.Out.WriteLineAsync("7. Check an artist's upcoming concerts at Ticketmaster");
             await Console.Out.WriteLineAsync("X. Log out");
         }
     }
