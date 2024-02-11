@@ -18,6 +18,8 @@ namespace MusicAPI
             builder.Services.AddScoped<IUserRepository, DbUserRepository>();
             builder.Services.AddHttpClient<ISpotifyHelper, SpotifyHelper>(c => { c.BaseAddress = new Uri("https://api.spotify.com/v1/"); c.DefaultRequestHeaders.Add("Accept", "application/.json"); });
             builder.Services.AddHttpClient<ISpotifyAccountHelper, SpotifyAccountHelper>(c => { c.BaseAddress = new Uri("https://accounts.spotify.com/api/"); });
+            var ticketmasterKey = builder.Configuration["Ticketmaster:ApiKey"];
+            builder.Services.AddScoped<ITicketmasterHelper>(t => new TicketmasterHelper(new HttpClient(), ticketmasterKey));
 
             var app = builder.Build();
 
@@ -49,7 +51,10 @@ namespace MusicAPI
             // POSTS - spotify
             app.MapPost("/spotify/Top50Songs/{searchArtist}/desc/{description}", APISpotifyHandler.AddArtistGenreAndTracksFromSpotify);
             app.MapPost("/spotify/Top100sTop10", APISpotifyHandler.Top100MostFollowedArtistsTop10Songs);
-            
+
+            // GETS - Ticketmaster
+            app.MapGet("/ticketmaster/{searchArtist}", APITicketmasterHandler.GetConcertsForArtist);
+
             app.Run();
         }
     }

@@ -3,20 +3,19 @@ using MusicAPI.Models;
 using MusicAPIClient.APIModels;
 using MusicAPIClient.Helpers;
 using System;
+using System.Linq.Expressions;
 using System.Net;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Text.Json;
 
 namespace MusicAPIClient.Handlers
 {
-   
+
     public class UserHandler
     {
         public static async Task GetArtistsForUser(HttpClient client, string username)
         {
-
-            // OBS lägg till omredigering från BadRequest
-            // "vill du lägga till artister nu?" och skicka till den metoden
 
             HttpResponseMessage response = await client.GetAsync($"/user/{username}/artist/");
             Console.Clear();
@@ -39,8 +38,8 @@ namespace MusicAPIClient.Handlers
 
                 ListArtists[] artists = JsonSerializer.Deserialize<ListArtists[]>(content);
 
-                ConsoleHelper.PrintColorGreen("Artists in your collection: ");
-                ConsoleHelper.PrintColorGreen("(it must be soo satisfying to read their names over and over again - wow!)");
+                await ConsoleHelper.PrintColorGreen("Artists in your collection: ");
+                await ConsoleHelper.PrintColorGreen("(it must be soo satisfying to read their names over and over again - wow!)");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("ARTIST NAME", "DESCRIPTION");
@@ -57,9 +56,6 @@ namespace MusicAPIClient.Handlers
 
         public static async Task GetSongsForUser(HttpClient client, string username)
         {
-            // OBS lägg till omredigering från BadRequest
-            // "vill du lägga till låtar nu?" och skicka till den metoden
-
             HttpResponseMessage response = await client.GetAsync($"/user/{username}/song/");
             Console.Clear();
 
@@ -79,8 +75,8 @@ namespace MusicAPIClient.Handlers
 
                 ListSongs[] songs = JsonSerializer.Deserialize<ListSongs[]>(content);
 
-                ConsoleHelper.PrintColorGreen("Songs in your collection: ");
-                ConsoleHelper.PrintColorGreen("(why would you listen to them when you can read their names?!)");
+                await ConsoleHelper.PrintColorGreen("Songs in your collection: ");
+                await ConsoleHelper.PrintColorGreen("(why would you listen to them when you can read their names?!)");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("SONG", "ARTIST", "GENRE");
@@ -97,9 +93,6 @@ namespace MusicAPIClient.Handlers
 
         public static async Task GetGenresForUser(HttpClient client, string username)
         {
-
-            // OBS lägg till omredigering från BadRequest
-            // "vill du lägga till genres nu?" och skicka till den metoden
 
             HttpResponseMessage response = await client.GetAsync($"/user/{username}/genre/");
             Console.Clear();
@@ -120,7 +113,7 @@ namespace MusicAPIClient.Handlers
 
                 ListGenres[] genres = JsonSerializer.Deserialize<ListGenres[]>(content);
 
-                ConsoleHelper.PrintColorGreen("Genres in your collection: ");
+                await ConsoleHelper.PrintColorGreen("Genres in your collection: ");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("GENRE");
@@ -157,14 +150,14 @@ namespace MusicAPIClient.Handlers
             while (true)
             {
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen("To see available songs choose: ");
-                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await ConsoleHelper.PrintColorGreen("To see available songs choose: ");
+                await ConsoleHelper.PrintColorGreen("--------------------------------");
                 await Console.Out.WriteLineAsync("1. To see all songs in alphabetical order");
                 await Console.Out.WriteLineAsync("2. To search for an song title");
                 await Console.Out.WriteLineAsync("X. To go back to previous menu");
 
                 input = Console.ReadLine();
-                
+
                 switch (input)
                 {
                     case "1":
@@ -182,7 +175,7 @@ namespace MusicAPIClient.Handlers
                         return;
 
                     default:
-                        ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        await ConsoleHelper.PrintColorRed("Invalid input, try again.");
                         Console.ReadLine();
                         break;
 
@@ -203,7 +196,7 @@ namespace MusicAPIClient.Handlers
             }
             else if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to get songs. Status code: {response.StatusCode}");
+                await ConsoleHelper.PrintColorRed($"Failed to get songs. Status code: {response.StatusCode}");
             }
             string content = await response.Content.ReadAsStringAsync();
             ListSongs[] songs = JsonSerializer.Deserialize<ListSongs[]>(content);
@@ -228,13 +221,13 @@ namespace MusicAPIClient.Handlers
 
                 if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    ConsoleHelper.PrintColorRed("No available songs yet. Press any key and ask your admin to fill the database.");
+                    await ConsoleHelper.PrintColorRed("No available songs yet. Press any key and ask your admin to fill the database.");
                     Console.ReadKey();
                     return;
                 }
                 else if (!response.IsSuccessStatusCode)
                 {
-                    ConsoleHelper.PrintColorRed($"Failed to get available artists. Status code: {response.StatusCode}");
+                    await ConsoleHelper.PrintColorRed($"Failed to get available artists. Status code: {response.StatusCode}");
                 }
 
                 content = await response.Content.ReadAsStringAsync();
@@ -243,7 +236,7 @@ namespace MusicAPIClient.Handlers
 
 
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen($"There are {amount} songs you can choose among: ");
+                await ConsoleHelper.PrintColorGreen($"There are {amount} songs you can choose among: ");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("No", "SONG", "ARTIST", "GENRE");
@@ -257,12 +250,12 @@ namespace MusicAPIClient.Handlers
 
                 if (numberOfPages > 1 && pageNumber > 1)
                 {
-                    ConsoleHelper.PrintColorGreen("<= Press left to see previous page with songs.");
+                    await ConsoleHelper.PrintColorGreen("<= Press left to see previous page with songs.");
                 }
 
                 if (numberOfPages > 1 && pageNumber < numberOfPages)
                 {
-                    ConsoleHelper.PrintColorGreen("=> Press right to see next page with songs.");
+                    await ConsoleHelper.PrintColorGreen("=> Press right to see next page with songs.");
                 }
 
                 await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
@@ -294,7 +287,7 @@ namespace MusicAPIClient.Handlers
                         int maxSongNumberThisTable = amountPerPage * (pageNumber - 1) + amountOnThisPage; // 1 on first page but e.g. 11 on second
                         if (!int.TryParse(input.ToString(), out chosenSong) || chosenSong < minSongNumberThisTable || chosenSong > maxSongNumberThisTable)
                         {
-                            ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
+                            await ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
                             Console.ReadKey();
                         }
 
@@ -336,12 +329,12 @@ namespace MusicAPIClient.Handlers
             response = await client.PostAsync($"/user/{username}/song/{songId}/", jsonContent);
             if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to connect user to song (status code {response.StatusCode})");
+                await ConsoleHelper.PrintColorRed($"Failed to connect user to song (status code {response.StatusCode})");
                 Console.ReadKey();
             }
             else
             {
-                ConsoleHelper.PrintColorGreen($"Congratulations, you have added {songName} to your collection! ");
+                await ConsoleHelper.PrintColorGreen($"Congratulations, you have added {songName} to your collection! ");
                 // or it was already in user's collection - no control for that now
                 Console.ReadKey();
             }
@@ -359,7 +352,7 @@ namespace MusicAPIClient.Handlers
 
             // Part 1
 
-           
+
             string input = "";
             string request = "";
             string nameSearch = "";
@@ -367,12 +360,12 @@ namespace MusicAPIClient.Handlers
             while (true)
             {
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen("To see available artists choose: ");
-                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await ConsoleHelper.PrintColorGreen("To see available artists choose: ");
+                await ConsoleHelper.PrintColorGreen("--------------------------------");
                 await Console.Out.WriteLineAsync("1. To see all artists in alphabetical order");
                 await Console.Out.WriteLineAsync("2. To search for an artist name");
                 await Console.Out.WriteLineAsync("X. To go back to previous menu");
-                
+
                 input = Console.ReadLine();
 
                 switch (input)
@@ -392,7 +385,7 @@ namespace MusicAPIClient.Handlers
                         return;
 
                     default:
-                        ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        await ConsoleHelper.PrintColorRed("Invalid input, try again.");
                         Console.ReadLine();
                         break;
 
@@ -413,7 +406,7 @@ namespace MusicAPIClient.Handlers
             }
             else if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to get artists. Status code: {response.StatusCode}");
+                await ConsoleHelper.PrintColorRed($"Failed to get artists. Status code: {response.StatusCode}");
             }
             string content = await response.Content.ReadAsStringAsync();
             ListArtists[] artists = JsonSerializer.Deserialize<ListArtists[]>(content);
@@ -432,19 +425,19 @@ namespace MusicAPIClient.Handlers
 
             while (true)
             {
-                
+
                 request = $"/artist/?name={nameSearch}&pageNumber={pageNumber}&amountPerPage={amountPerPage}";
                 response = await client.GetAsync(request);
 
                 if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    ConsoleHelper.PrintColorRed("No available artists yet. Press any key to return to menu and ask your admin to fill the database.");
+                    await ConsoleHelper.PrintColorRed("No available artists yet. Press any key to return to menu and ask your admin to fill the database.");
                     Console.ReadKey();
                     return;
                 }
                 else if (!response.IsSuccessStatusCode)
                 {
-                    ConsoleHelper.PrintColorRed($"Failed to get available artists. Status code: {response.StatusCode}");
+                    await ConsoleHelper.PrintColorRed($"Failed to get available artists. Status code: {response.StatusCode}");
                 }
 
                 content = await response.Content.ReadAsStringAsync();
@@ -453,7 +446,7 @@ namespace MusicAPIClient.Handlers
 
 
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen("Available artists: ");
+                await ConsoleHelper.PrintColorGreen("Available artists: ");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("No", "ARTIST NAME", "DESCRIPTION");
@@ -467,12 +460,12 @@ namespace MusicAPIClient.Handlers
 
                 if (numberOfPages > 1 && pageNumber > 1)
                 {
-                    ConsoleHelper.PrintColorGreen("<= Press left to see previous page with artists.");
+                    await ConsoleHelper.PrintColorGreen("<= Press left to see previous page with artists.");
                 }
 
                 if (numberOfPages > 1 && pageNumber < numberOfPages)
                 {
-                    ConsoleHelper.PrintColorGreen("=> Press right to see next page with artists.");
+                    await ConsoleHelper.PrintColorGreen("=> Press right to see next page with artists.");
                 }
 
                 await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
@@ -494,7 +487,7 @@ namespace MusicAPIClient.Handlers
                     if (numberOfPages > 1 && pageNumber > 1 && keyInfo.Key == ConsoleKey.LeftArrow)
                     {
                         pageNumber--;
-                       break;
+                        break;
                     }
 
                     if (keyInfo.Key == ConsoleKey.Enter)
@@ -504,7 +497,7 @@ namespace MusicAPIClient.Handlers
                         int maxArtistNumberThisTable = amountPerPage * (pageNumber - 1) + amountOnThisPage; // 1 on first page but e.g. 11 on second
                         if (!int.TryParse(input.ToString(), out chosenArtist) || chosenArtist < minArtistNumberThisTable || chosenArtist > maxArtistNumberThisTable)
                         {
-                            ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
+                            await ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
                             Console.ReadKey();
                         }
 
@@ -546,12 +539,12 @@ namespace MusicAPIClient.Handlers
             response = await client.PostAsync($"/user/{username}/artist/{artistId}/", jsonContent);
             if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to connect user to artist (status code {response.StatusCode})");
+                await ConsoleHelper.PrintColorRed($"Failed to connect user to artist (status code {response.StatusCode})");
                 Console.ReadKey();
             }
             else
             {
-                ConsoleHelper.PrintColorGreen($"Congratulations, you have added {artistName} to your collection! ");
+                await ConsoleHelper.PrintColorGreen($"Congratulations, you have added {artistName} to your collection! ");
                 // or it was already in user's collection - no control for that now
                 Console.ReadKey();
             }
@@ -575,8 +568,8 @@ namespace MusicAPIClient.Handlers
             while (true)
             {
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen("To see available genres choose: ");
-                ConsoleHelper.PrintColorGreen("--------------------------------");
+                await ConsoleHelper.PrintColorGreen("To see available genres choose: ");
+                await ConsoleHelper.PrintColorGreen("--------------------------------");
                 await Console.Out.WriteLineAsync("1. To see all genres in alphabetical order");
                 await Console.Out.WriteLineAsync("2. To search for a specific genre");
                 await Console.Out.WriteLineAsync("X. To go back to previous menu");
@@ -600,7 +593,7 @@ namespace MusicAPIClient.Handlers
                         return;
 
                     default:
-                        ConsoleHelper.PrintColorRed("Invalid input, try again.");
+                        await ConsoleHelper.PrintColorRed("Invalid input, try again.");
                         Console.ReadLine();
                         break;
 
@@ -621,7 +614,7 @@ namespace MusicAPIClient.Handlers
             }
             else if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to get genres. Status code: {response.StatusCode}");
+                await ConsoleHelper.PrintColorRed($"Failed to get genres. Status code: {response.StatusCode}");
             }
             string content = await response.Content.ReadAsStringAsync();
             ListGenres[] genres = JsonSerializer.Deserialize<ListGenres[]>(content);
@@ -646,13 +639,13 @@ namespace MusicAPIClient.Handlers
 
                 if (response.StatusCode == HttpStatusCode.BadRequest)
                 {
-                    ConsoleHelper.PrintColorRed("No available genres yet. Press any key to return to menu and ask your admin to fill the database.");
+                    await ConsoleHelper.PrintColorRed("No available genres yet. Press any key to return to menu and ask your admin to fill the database.");
                     Console.ReadKey();
                     return;
                 }
                 else if (!response.IsSuccessStatusCode)
                 {
-                    ConsoleHelper.PrintColorRed($"Failed to get available genres. Status code: {response.StatusCode}");
+                    await ConsoleHelper.PrintColorRed($"Failed to get available genres. Status code: {response.StatusCode}");
                 }
 
                 content = await response.Content.ReadAsStringAsync();
@@ -661,7 +654,7 @@ namespace MusicAPIClient.Handlers
 
 
                 Console.Clear();
-                ConsoleHelper.PrintColorGreen("Available genres: ");
+                await ConsoleHelper.PrintColorGreen("Available genres: ");
                 await Console.Out.WriteLineAsync("");
 
                 var table = new ConsoleTable("No", "GENRE");
@@ -675,12 +668,12 @@ namespace MusicAPIClient.Handlers
 
                 if (numberOfPages > 1 && pageNumber > 1)
                 {
-                    ConsoleHelper.PrintColorGreen("<= Press left to see previous page with genres.");
+                    await ConsoleHelper.PrintColorGreen("<= Press left to see previous page with genres.");
                 }
 
                 if (numberOfPages > 1 && pageNumber < numberOfPages)
                 {
-                    ConsoleHelper.PrintColorGreen("=> Press right to see next page with genres.");
+                    await ConsoleHelper.PrintColorGreen("=> Press right to see next page with genres.");
                 }
 
                 await Console.Out.WriteLineAsync("Press X to go back to previous menu.");
@@ -712,7 +705,7 @@ namespace MusicAPIClient.Handlers
                         int maxGenreNumberThisTable = amountPerPage * (pageNumber - 1) + amountOnThisPage; // 1 on first page but e.g. 11 on second
                         if (!int.TryParse(input.ToString(), out chosenGenre) || chosenGenre < minGenreNumberThisTable || chosenGenre > maxGenreNumberThisTable)
                         {
-                            ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
+                            await ConsoleHelper.PrintColorRed("\nInvalid input, try again.");
                             Console.ReadKey();
                         }
 
@@ -754,15 +747,59 @@ namespace MusicAPIClient.Handlers
             response = await client.PostAsync($"/user/{username}/genre/{genreId}/", jsonContent);
             if (!response.IsSuccessStatusCode)
             {
-                ConsoleHelper.PrintColorRed($"Failed to connect user to genre (status code {response.StatusCode})");
+                await ConsoleHelper.PrintColorRed($"Failed to connect user to genre (status code {response.StatusCode})");
                 Console.ReadKey();
             }
             else
             {
-                ConsoleHelper.PrintColorGreen($"Congratulations, you have added {genreTitle} to your collection! ");
+                await ConsoleHelper.PrintColorGreen($"Congratulations, you have added {genreTitle} to your collection! ");
                 // or it was already in user's collection - no control for that now
                 Console.ReadKey();
             }
+        }
+
+        public static async Task GetConcertsForArtist(HttpClient client)
+        {
+            Console.Clear();
+            await Console.Out.WriteAsync("Type name of the artist: ");
+            string searchArtist = Console.ReadLine();
+            if (!string.IsNullOrEmpty(searchArtist))
+            {
+                var response = await client.GetAsync($"/ticketmaster/{searchArtist}");
+
+                TicketmasterArtistConcertsDto concerts = JsonSerializer.Deserialize<TicketmasterArtistConcertsDto>(await response.Content.ReadAsStringAsync());
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var table = new ConsoleTable("DATE", "CITY", "COUNTRY", "WEBSITE");
+
+                    foreach (var concert in concerts.Concerts)
+                    {
+                        table.AddRow(concert.Date, concert.City, concert.Country, concert.Website);
+                    }
+
+                    if (concerts.Concerts.Count() == 0)
+                    {
+                        await Console.Out.WriteAsync($"No concerts found for {searchArtist}");
+                    }
+                    else
+                    {
+                        Console.SetWindowSize(Console.LargestWindowWidth, Console.LargestWindowHeight);
+                        await Console.Out.WriteAsync($"\nUpcoming concerts for {searchArtist}:\n");
+                        table.Write(Format.Minimal);
+                    }
+                }
+                else 
+                    await ConsoleHelper.PrintColorRed($"{concerts.Message}");
+            }
+            else
+            {
+                await ConsoleHelper.PrintColorRed("No artist specified.");
+            }
+
+            await Console.Out.WriteLineAsync("Press any key to return to menu");
+            Console.ReadLine();
+            Console.Clear();
         }
     }
 }

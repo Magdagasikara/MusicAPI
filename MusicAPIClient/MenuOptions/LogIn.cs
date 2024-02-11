@@ -1,18 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore.Query.Internal;
-using MusicAPIClient.APIModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using MusicAPIClient.APIModels;
+using MusicAPIClient.Helpers;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
-using MusicAPI.Data;
-using Microsoft.EntityFrameworkCore;
-using MusicAPIClient.Helpers;
-using MusicAPI.Handlers;
-using MusicAPI.Services;
-using MusicAPIClient.MenuOptions;
-using MusicAPI.Repositories;
 
 namespace MusicAPIClient.MenuOptions
 {
@@ -27,7 +16,7 @@ namespace MusicAPIClient.MenuOptions
             await Console.Out.WriteLineAsync("Press X to exit");
 
             Console.SetCursorPosition(0, 0);
-            MenuHelper.HeaderLogin();
+            await MenuHelper.HeaderLogin();
 
             while (true)
             {
@@ -42,15 +31,15 @@ namespace MusicAPIClient.MenuOptions
                 if (!response.IsSuccessStatusCode)
                 {
                     Console.Clear();
-                    MenuHelper.HeaderLogin();
+                    await MenuHelper.HeaderLogin();
 
                     await Console.Out.WriteAsync($"User {username} doesn't exist. Do you wish to create a new account? (Y/N) ");
                     string input = Console.ReadLine();
 
                     if (input.ToUpper() == "Y" || input.ToUpper() == "YES" || input.ToUpper() == "J" || input.ToUpper() == "JA")
                     {
-                        // OBS-----
-                        // lyfta ut det till UserHandler som AddUser
+                        // -----
+                        // it would be better to put it seperately in UserHandler as AddUser
                         // --------
                         AddUser user = new AddUser()
                         {
@@ -63,18 +52,18 @@ namespace MusicAPIClient.MenuOptions
                         response = await client.PostAsync("/user/", jsonContent);
                         if (!response.IsSuccessStatusCode)
                         {
-                            ConsoleHelper.PrintColorRed($"Failed to create user (status code {response.StatusCode})");
+                            await ConsoleHelper.PrintColorRed($"Failed to create user (status code {response.StatusCode})");
                             Console.ReadKey();
                         }
                         // --------
-                        // lyfta ut det till UserHandler som AddUser
-                        // -----OBS
+                        // until here
+                        // --------
                         response = await client.GetAsync($"/user/{username}");
                         break;
                     }
                     else
                     {
-                        ConsoleHelper.PrintColorRed("\nTry to log in with another username or press X to exit.");
+                        await ConsoleHelper.PrintColorRed("\nTry to log in with another username or press X to exit.");
                         Console.ReadKey();
                         continue;
                     }
@@ -102,7 +91,7 @@ namespace MusicAPIClient.MenuOptions
             }
         }
 
-        public static void LogOutUser()
+        public static async Task LogOutUser()
         {
             if (!string.IsNullOrEmpty(username))
             {
@@ -111,7 +100,7 @@ namespace MusicAPIClient.MenuOptions
             }
             else
             {
-                ConsoleHelper.PrintColorRed("No user is currently logged in.");
+                await ConsoleHelper.PrintColorRed("No user is currently logged in.");
             }
         }
     }

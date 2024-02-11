@@ -29,4 +29,12 @@
     {
         public override string Message => "No artist found for spotify searchquery";
     }
+    public class TicketmasterArtistNotFoundException : Exception
+    {
+        public override string Message => "Artist not found at Ticketmaster";
+    }
+    public class TicketmasterConcertsNotFoundException : Exception
+    {
+        public override string Message => "Concerts not found at Ticketmaster";
+    }
 }
