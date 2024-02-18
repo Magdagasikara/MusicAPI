@@ -1,4 +1,7 @@
 # MusicAPI
+A group school assignment to practice setting up REST APIs, calling external APIs and building a console client to communicate with them. We use MsTests for unit tests.
+We store songs/artists/genres from Spotify API and users can add their music interests and access them from a console client. 
+![Music-API-flow](Music-API-flow.jpeg)
 
 # Instructions
 * Create a new database
